@@ -24,7 +24,7 @@ Each controller is mounted at `/<entity>/api` and has the same method names:
 |----------|------------------|---------|
 | Section  | `/section/api`   | `GET /printAuthor`, `POST /postNewSection`, `GET /getAllSections`, `GET /getSection/{id}`, `PUT /putSection`, `DELETE /deleteSection/{id}` |
 | Topic    | `/topic/api`     | same pattern with `Topic` / `Topics`, including `GET /getTopic/{id}` |
-| User     | `/user/api`      | same pattern with `User` / `Users`, including `GET /getUser/{id}` |
+| User     | `/user/api`      | same pattern with `User` / `Users`, including `GET /getUser/{id}`, plus `POST /login` (body `{ email, passwordHash }` with the plain password; returns the user, 400 "Incorrect email or password!" on a wrong email or password) |
 | Quiz     | `/quiz/api`      | same pattern with `Quiz` / `Quizzes`, including `GET /getQuiz/{id}` |
 | Question | `/question/api`  | same pattern with `Question` / `Questions`, including `GET /getQuestion/{id}` |
 | Choice   | `/choice/api`    | same pattern with `Choice` / `Choices`, including `GET /getChoice/{id}` |

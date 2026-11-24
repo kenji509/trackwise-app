@@ -1,9 +1,10 @@
+import SideUser from './SideUser.jsx'
 import './SideBar.css'
 
 // Desktop/tablet navigation: brand, collapse toggle, nav sections, signed-in user.
 // Collapsed (or tablet width) it becomes a labeled rail. Hidden on mobile,
 // where Header shows the same sections in a drawer.
-function SideBar({ collapsed, onToggle, children }) {
+function SideBar({ collapsed, onToggle, user, onLogout, children }) {
   return (
     <aside className="sidebar">
       <div className="sidebar__inner">
@@ -37,21 +38,7 @@ function SideBar({ collapsed, onToggle, children }) {
           {children}
         </nav>
 
-        <div className="sidebar__user">
-          <span className="avatar" aria-hidden="true">
-            <svg className="icon" viewBox="0 0 24 24">
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 21a8 8 0 0 1 16 0" />
-            </svg>
-          </span>
-          <span className="sidebar__user-text">
-            <span className="sr-only">Signed in as </span>
-            <span className="sidebar__user-name">Teacher</span>
-            <span className="sidebar__user-role" aria-hidden="true">
-              Signed in
-            </span>
-          </span>
-        </div>
+        <SideUser user={user} onLogout={onLogout} />
       </div>
     </aside>
   )

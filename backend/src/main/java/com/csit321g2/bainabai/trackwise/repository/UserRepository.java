@@ -1,5 +1,7 @@
 package com.csit321g2.bainabai.trackwise.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import com.csit321g2.bainabai.trackwise.entity.UserEntity;
@@ -8,4 +10,6 @@ import com.csit321g2.bainabai.trackwise.entity.UserEntity;
 public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
     boolean existsByEmailIgnoreCase(String email);
+
+    Optional<UserEntity> findByEmailIgnoreCase(String email);
 }

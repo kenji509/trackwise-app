@@ -27,7 +27,15 @@ public class UserService {
     }
 
     public UserEntity postUser(UserEntity user) {
-        if (user.getEmail() != null && repo.existsByEmailIgnoreCase(user.getEmail())) {
+        if (user.getFullName() == null || user.getFullName().isBlank()) {
+            throw new IllegalArgumentException("Full name is required!");
+        }
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            throw new IllegalArgumentException("Email is required!");
+        }
+        user.setFullName(user.getFullName().trim());
+        user.setEmail(user.getEmail().trim());
+        if (repo.existsByEmailIgnoreCase(user.getEmail())) {
             throw new IllegalArgumentException("Email " + user.getEmail() + " already exists!");
         }
         if (user.getPasswordHash() == null || user.getPasswordHash().isBlank()) {
@@ -40,6 +48,15 @@ public class UserService {
             user.setSection(section);
         }
         return repo.save(user);
+    }
+
+    public UserEntity login(String email, String password) {
+        if (email == null || email.isBlank() || password == null || password.isBlank()) {
+            throw new IllegalArgumentException("Email and password are required!");
+        }
+        return repo.findByEmailIgnoreCase(email.trim())
+                .filter(user -> encoder.matches(password, user.getPasswordHash()))
+                .orElseThrow(() -> new IllegalArgumentException("Incorrect email or password!"));
     }
 
     public List<UserEntity> getAllUsers() {

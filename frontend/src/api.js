@@ -59,3 +59,18 @@ export function getQuestions() {
 export function getTopics() {
   return request('/topic/api/getAllTopics')
 }
+
+export function login(email, password) {
+  return request('/user/api/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, passwordHash: password }),
+  })
+}
+
+export function register(user) {
+  return request('/user/api/postNewUser', { method: 'POST', body: JSON.stringify(user) })
+}
+
+export function getSections() {
+  return request('/section/api/getAllSections')
+}

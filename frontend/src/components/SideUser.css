@@ -1,0 +1,75 @@
+.side-user {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  box-shadow: var(--shadow-sm);
+}
+
+.side-user__info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.side-user__avatar {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 2px;
+  background: var(--color-sunny);
+  color: var(--color-on-sunny);
+  box-shadow: 0 2px 0 var(--color-sunny-lip);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+.side-user__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.side-user__name {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.side-user__role {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.side-user__logout {
+  width: 100%;
+}
+
+@container sidebar (max-width: 160px) {
+  .side-user {
+    align-items: center;
+    padding: var(--space-2) 0;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .side-user__text,
+  .side-user__logout-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .side-user__logout {
+    width: var(--touch-target);
+    padding: 0;
+  }
+}

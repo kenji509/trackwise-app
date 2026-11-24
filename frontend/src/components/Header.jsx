@@ -1,10 +1,12 @@
 import { useEffect, useRef } from 'react'
+import SideUser from './SideUser.jsx'
+import { initials } from '../authForm.js'
 import './Header.css'
 
 // Mobile-only app bar: menu button, logo, signed-in user.
 // The menu opens the navigation (children) in a drawer built on a native
 // modal <dialog>: focus stays inside, Esc closes it, focus returns to the button.
-function Header({ children }) {
+function Header({ user, onLogout, children }) {
   const drawerRef = useRef(null)
 
   function openMenu() {
@@ -13,6 +15,11 @@ function Header({ children }) {
 
   function closeMenu() {
     drawerRef.current.close()
+  }
+
+  function logoutFromMenu() {
+    closeMenu()
+    onLogout()
   }
 
   // Clicking the dimmed area outside the panel closes the drawer
@@ -58,11 +65,8 @@ function Header({ children }) {
           <span>TrackWise</span>
         </div>
 
-        <span className="avatar" role="img" aria-label="Signed in as Teacher">
-          <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="12" cy="8" r="4" />
-            <path d="M4 21a8 8 0 0 1 16 0" />
-          </svg>
+        <span className="avatar" role="img" aria-label={`Signed in as ${user.fullName}`}>
+          {initials(user.fullName)}
         </span>
       </header>
 
@@ -91,6 +95,8 @@ function Header({ children }) {
           <nav className="drawer__nav" aria-label="Main" onClick={handleNavClick}>
             {children}
           </nav>
+
+          <SideUser user={user} onLogout={logoutFromMenu} />
         </div>
       </dialog>
     </>
