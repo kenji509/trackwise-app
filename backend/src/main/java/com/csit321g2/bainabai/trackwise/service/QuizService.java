@@ -1,14 +1,21 @@
 package com.csit321g2.bainabai.trackwise.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.csit321g2.bainabai.trackwise.entity.ChoiceEntity;
+import com.csit321g2.bainabai.trackwise.entity.QuestionEntity;
 import com.csit321g2.bainabai.trackwise.entity.QuizEntity;
 import com.csit321g2.bainabai.trackwise.entity.Role;
 import com.csit321g2.bainabai.trackwise.entity.UserEntity;
+import com.csit321g2.bainabai.trackwise.repository.ChoiceRepository;
+import com.csit321g2.bainabai.trackwise.repository.QuestionRepository;
 import com.csit321g2.bainabai.trackwise.repository.QuizRepository;
 import com.csit321g2.bainabai.trackwise.repository.UserRepository;
 
@@ -17,6 +24,12 @@ public class QuizService {
 
     @Autowired
     QuizRepository repo;
+
+    @Autowired
+    QuestionRepository questionRepo;
+
+    @Autowired
+    ChoiceRepository choiceRepo;
 
     @Autowired
     UserRepository userRepo;
@@ -43,6 +56,20 @@ public class QuizService {
 
     public QuizEntity getQuiz(int id) {
         return repo.findById(id).orElseThrow(() -> new NoSuchElementException("Quiz " + id + " does not exist!"));
+    }
+
+    public List<QuestionEntity> getQuizQuestions(int quizId) {
+        if (!repo.existsById(quizId)) {
+            throw new NoSuchElementException("Quiz " + quizId + " does not exist!");
+        }
+        List<QuestionEntity> questions = questionRepo.findByQuizQuizIdOrderByQuestionIdAsc(quizId);
+        Map<Integer, List<ChoiceEntity>> choicesByQuestion = choiceRepo.findByQuestionQuizQuizIdOrderByChoiceIdAsc(quizId)
+                .stream()
+                .collect(Collectors.groupingBy(choice -> choice.getQuestion().getQuestionId()));
+        for (QuestionEntity question : questions) {
+            question.setChoices(choicesByQuestion.getOrDefault(question.getQuestionId(), new ArrayList<>()));
+        }
+        return questions;
     }
 
     public QuizEntity putQuiz(int id, QuizEntity newDetails) {

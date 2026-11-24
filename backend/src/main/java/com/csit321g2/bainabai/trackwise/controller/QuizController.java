@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.csit321g2.bainabai.trackwise.entity.QuestionEntity;
 import com.csit321g2.bainabai.trackwise.entity.QuizEntity;
 import com.csit321g2.bainabai.trackwise.service.NameErrorResponse;
 import com.csit321g2.bainabai.trackwise.service.QuizService;
@@ -51,6 +52,11 @@ public class QuizController {
     @GetMapping("/getQuiz/{id}")
     public QuizEntity getQuiz(@PathVariable int id) {
         return service.getQuiz(id);
+    }
+
+    @GetMapping("/getQuizQuestions/{quizId}")
+    public List<QuestionEntity> getQuizQuestions(@PathVariable int quizId) {
+        return service.getQuizQuestions(quizId);
     }
 
     @PutMapping("/putQuiz")

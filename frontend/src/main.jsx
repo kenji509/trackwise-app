@@ -21,12 +21,20 @@ import AuthLayout from './components/AuthLayout.jsx'
 import AuthForm from './components/AuthForm.jsx'
 import RoleTabs from './components/RoleTabs.jsx'
 import RoleChoice from './components/RoleChoice.jsx'
-import StudentHome from './components/StudentHome.jsx'
+import AvailableQuizzes from './components/AvailableQuizzes.jsx'
+import StudentQuizCard from './components/StudentQuizCard.jsx'
+import QuizLayout from './components/QuizLayout.jsx'
+import QuizTimer from './components/QuizTimer.jsx'
+import QuestionCard from './components/QuestionCard.jsx'
+import QuestionNavigator from './components/QuestionNavigator.jsx'
+import ConfirmDialog from './components/ConfirmDialog.jsx'
+import QuizSubmitted from './components/QuizSubmitted.jsx'
 import * as api from './api.js'
 import { emptyForm, toForm, toRequestBody, validateQuiz } from './quizForm.js'
 import {
   emptyLogin,
   emptyRegister,
+  firstName,
   isEmailTaken,
   isValidUser,
   roleProblem,
@@ -35,6 +43,13 @@ import {
   validateLogin,
   validateRegister,
 } from './authForm.js'
+import {
+  attemptSummary,
+  availableQuizViews,
+  createAttempt,
+  listNumbers,
+  secondsUntil,
+} from './quizAttempt.js'
 import {
   SORT_OPTIONS,
   buildQuizViews,
@@ -594,6 +609,332 @@ function App({ user, onLogout }) {
   )
 }
 
+const studentNavSections = [
+  {
+    label: 'Learning',
+    items: [{ id: 'quizzes', label: 'Available Quizzes' }],
+  },
+]
+
+// eslint-disable-next-line react-refresh/only-export-components
+function StudentApp({ user, onLogout }) {
+  const [quizzes, setQuizzes] = useState([])
+  const [questions, setQuestions] = useState([])
+  const [now, setNow] = useState(PAGE_LOADED_AT)
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
+  const [loadAttempt, setLoadAttempt] = useState(0)
+  const [navCollapsed, setNavCollapsed] = useState(() => readStored(NAV_KEY) === '1')
+  const [startingId, setStartingId] = useState(null)
+  const [startError, setStartError] = useState(null)
+  const [attempt, setAttempt] = useState(null)
+  const [current, setCurrent] = useState(0)
+  const [answers, setAnswers] = useState({})
+  const [marked, setMarked] = useState({})
+  const [secondsLeft, setSecondsLeft] = useState(0)
+  const [confirming, setConfirming] = useState(null)
+  const [finished, setFinished] = useState(null)
+
+  const taking = attempt !== null && finished === null
+  const deadline = attempt ? attempt.deadline : 0
+
+  useEffect(() => {
+    let ignore = false
+
+    Promise.all([api.getQuizzes(), api.getQuestions()])
+      .then(([quizList, questionList]) => {
+        if (ignore) return
+        setQuizzes(quizList)
+        setQuestions(questionList)
+        setNow(Date.now())
+      })
+      .catch((error) => {
+        if (!ignore) setLoadError(error.message)
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false)
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [loadAttempt])
+
+  useEffect(() => {
+    document.title = `${attempt ? attempt.quiz.title : 'Available Quizzes'} · TrackWise`
+  }, [attempt])
+
+  useEffect(() => {
+    if (!taking) return
+
+    const timer = setInterval(() => {
+      const left = secondsUntil(deadline, Date.now())
+      setSecondsLeft(left)
+      if (left > 0) return
+
+      flushSync(() => {
+        setConfirming(null)
+        setFinished('time')
+      })
+      window.scrollTo(0, 0)
+      focusById('quiz-result-title')
+    }, 250)
+
+    return () => clearInterval(timer)
+  }, [taking, deadline])
+
+  useEffect(() => {
+    if (!taking) return
+
+    function warnBeforeLeaving(event) {
+      event.preventDefault()
+      event.returnValue = ''
+    }
+
+    window.addEventListener('beforeunload', warnBeforeLeaving)
+    return () => window.removeEventListener('beforeunload', warnBeforeLeaving)
+  }, [taking])
+
+  function retryLoad() {
+    setLoading(true)
+    setLoadError('')
+    setLoadAttempt(loadAttempt + 1)
+  }
+
+  function toggleNav() {
+    const next = !navCollapsed
+    setNavCollapsed(next)
+    writeStored(NAV_KEY, next ? '1' : '0')
+  }
+
+  async function startQuiz(quiz) {
+    if (startingId !== null) return
+    setStartingId(quiz.quizId)
+    setStartError(null)
+
+    try {
+      const list = await api.getQuizQuestions(quiz.quizId)
+      const playable = list.filter((question) => question.choices?.length > 0)
+      if (playable.length === 0) throw new Error('This quiz has no questions to answer yet.')
+
+      const next = createAttempt(quiz, playable)
+      flushSync(() => {
+        setAttempt(next)
+        setSecondsLeft(next.totalSeconds)
+        setCurrent(0)
+        setAnswers({})
+        setMarked({})
+        setConfirming(null)
+        setFinished(null)
+        setStartingId(null)
+      })
+      window.scrollTo(0, 0)
+      focusById('question-text')
+    } catch (error) {
+      setStartError({ quizId: quiz.quizId, message: error.message })
+      setStartingId(null)
+    }
+  }
+
+  function selectChoice(questionId, choiceId) {
+    setAnswers({ ...answers, [questionId]: choiceId })
+  }
+
+  function toggleMark(questionId) {
+    setMarked({ ...marked, [questionId]: !marked[questionId] })
+  }
+
+  function submitQuiz() {
+    flushSync(() => {
+      setConfirming(null)
+      setFinished('submitted')
+    })
+    window.scrollTo(0, 0)
+    focusById('quiz-result-title')
+  }
+
+  function leaveQuiz() {
+    flushSync(() => {
+      setConfirming(null)
+      setAttempt(null)
+      setFinished(null)
+      setAnswers({})
+      setMarked({})
+    })
+    window.scrollTo(0, 0)
+    focusById('main')
+  }
+
+  if (attempt && finished) {
+    const summary = attemptSummary(attempt.questions, answers, marked)
+    return (
+      <QuizLayout title={attempt.quiz.title}>
+        <QuizSubmitted
+          answered={summary.answeredCount}
+          total={summary.total}
+          timedOut={finished === 'time'}
+          onDone={leaveQuiz}
+        />
+      </QuizLayout>
+    )
+  }
+
+  if (attempt) {
+    const summary = attemptSummary(attempt.questions, answers, marked)
+    const question = attempt.questions[current]
+    const unansweredCount = summary.unanswered.length
+
+    return (
+      <>
+        <QuizLayout
+          title={attempt.quiz.title}
+          actions={
+            <>
+              <QuizTimer seconds={secondsLeft} totalSeconds={attempt.totalSeconds} />
+              <button
+                type="button"
+                className="btn btn-secondary quiz-layout__exit"
+                onClick={() => setConfirming('exit')}
+              >
+                <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <path d="m16 17 5-5-5-5" />
+                  <path d="M21 12H9" />
+                </svg>
+                <span className="quiz-layout__exit-label">Exit quiz</span>
+              </button>
+            </>
+          }
+          aside={
+            <QuestionNavigator
+              questions={attempt.questions}
+              current={current}
+              answers={answers}
+              marked={marked}
+              answeredCount={summary.answeredCount}
+              onJump={setCurrent}
+              onSubmit={() => setConfirming('submit')}
+            />
+          }
+        >
+          <QuestionCard
+            number={current + 1}
+            total={summary.total}
+            question={question}
+            selectedChoiceId={answers[question.questionId]}
+            onSelect={(choiceId) => selectChoice(question.questionId, choiceId)}
+            marked={Boolean(marked[question.questionId])}
+            onToggleMark={() => toggleMark(question.questionId)}
+            onPrevious={() => setCurrent(current - 1)}
+            onNext={() => setCurrent(current + 1)}
+          />
+        </QuizLayout>
+
+        <ConfirmDialog
+          open={confirming === 'submit'}
+          title="Submit quiz?"
+          cancelLabel="Keep working"
+          confirmLabel="Submit quiz"
+          onConfirm={submitQuiz}
+          onCancel={() => setConfirming(null)}
+        >
+          {unansweredCount > 0 ? (
+            <p className="confirm-dialog__warning">
+              <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+                <path d="M12 9v4M12 17h.01" />
+              </svg>
+              <span>
+                You have <strong>{plural(unansweredCount, 'unanswered question')}</strong>:{' '}
+                {unansweredCount === 1 ? 'question' : 'questions'} {listNumbers(summary.unanswered)}.
+              </span>
+            </p>
+          ) : (
+            <p>You answered all {plural(summary.total, 'question')}.</p>
+          )}
+          {summary.markedCount > 0 && (
+            <p>
+              {plural(summary.markedCount, 'question')} {summary.markedCount === 1 ? 'is' : 'are'}{' '}
+              still marked for review.
+            </p>
+          )}
+          <p>You can’t change your answers after you submit.</p>
+        </ConfirmDialog>
+
+        <ConfirmDialog
+          open={confirming === 'exit'}
+          title="Exit quiz?"
+          cancelLabel="Keep working"
+          confirmLabel="Exit quiz"
+          danger
+          onConfirm={leaveQuiz}
+          onCancel={() => setConfirming(null)}
+        >
+          <p>Your answers won’t be saved and the timer will stop. You’ll go back to Available Quizzes.</p>
+        </ConfirmDialog>
+      </>
+    )
+  }
+
+  const available = availableQuizViews(buildQuizViews(quizzes, questions))
+
+  let heroSummary = `${plural(available.length, 'quiz', 'quizzes')} ready to take`
+  if (loading) heroSummary = 'Loading your quizzes…'
+  if (loadError) heroSummary = 'Your quizzes will appear here once the server is reachable.'
+
+  const navigation = studentNavSections.map((section) => (
+    <SideSection key={section.label} label={section.label}>
+      {section.items.map((item) => (
+        <SideBtn key={item.id} icon={item.id} label={item.label} active={item.id === 'quizzes'} />
+      ))}
+    </SideSection>
+  ))
+
+  return (
+    <>
+      <a href="#main" className="skip-link">
+        Skip to main content
+      </a>
+
+      <div className="app" data-nav={navCollapsed ? 'collapsed' : 'expanded'}>
+        <SideBar collapsed={navCollapsed} onToggle={toggleNav} user={user} onLogout={onLogout}>
+          {navigation}
+        </SideBar>
+
+        <div className="app__column">
+          <Header user={user} onLogout={onLogout}>
+            {navigation}
+          </Header>
+
+          <MainContent
+            eyebrow={`${greeting(now)}, ${firstName(user.fullName)}`}
+            title="Available Quizzes"
+            summary={heroSummary}
+          >
+            <AvailableQuizzes
+              loading={loading}
+              loadError={loadError}
+              onRetry={retryLoad}
+              count={available.length}
+            >
+              {available.map((item, index) => (
+                <StudentQuizCard
+                  key={item.quiz.quizId}
+                  item={item}
+                  index={index}
+                  starting={startingId === item.quiz.quizId}
+                  error={startError?.quizId === item.quiz.quizId ? startError.message : ''}
+                  onStart={() => startQuiz(item.quiz)}
+                />
+              ))}
+            </AvailableQuizzes>
+          </MainContent>
+        </div>
+      </div>
+    </>
+  )
+}
+
 // eslint-disable-next-line react-refresh/only-export-components
 function Root() {
   const [user, setUser] = useState(readStoredUser)
@@ -611,7 +952,7 @@ function Root() {
   const [sectionsAttempt, setSectionsAttempt] = useState(0)
 
   let pageTitle = screen === 'register' ? 'Create account' : 'Log in'
-  if (user) pageTitle = user.role === 'TEACHER' ? 'Quizzes' : 'Student dashboard'
+  if (user) pageTitle = user.role === 'TEACHER' ? 'Quizzes' : 'Available Quizzes'
 
   useEffect(() => {
     document.title = `${pageTitle} · TrackWise`
@@ -677,7 +1018,7 @@ function Root() {
       setAuthError('')
       setTakenEmail('')
     })
-    focusById(account.role === 'TEACHER' ? 'main' : 'student-title')
+    focusById('main')
   }
 
   function logout() {
@@ -764,7 +1105,7 @@ function Root() {
   }
 
   if (user?.role === 'TEACHER') return <App user={user} onLogout={logout} />
-  if (user) return <StudentHome user={user} onLogout={logout} />
+  if (user) return <StudentApp user={user} onLogout={logout} />
 
   const isRegister = screen === 'register'
   const sectionChoices = sectionOptions(sections)

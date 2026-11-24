@@ -1,0 +1,115 @@
+.student-quiz-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 var(--space-5) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  animation: student-card-in var(--duration-enter) var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+}
+
+.student-quiz-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+@keyframes student-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.student-quiz-card__band {
+  display: flex;
+  align-items: center;
+  min-height: 60px;
+  margin: -1px calc(-1 * var(--space-5) - 1px) var(--space-1);
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  background-color: var(--accent-soft);
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--accent-bright) 55%, transparent) 1.3px,
+    transparent 1.5px
+  );
+  background-position: 7px 7px;
+  background-size: 14px 14px;
+}
+
+.student-quiz-card__time {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.08);
+  color: var(--accent-ink);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.student-quiz-card__time .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.student-quiz-card__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.student-quiz-card__title {
+  font-size: 1.1875rem;
+  overflow-wrap: anywhere;
+}
+
+.student-quiz-card__teacher {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-quiz-card__description {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.student-quiz-card__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: var(--space-3);
+  border-top: 1px dashed var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.student-quiz-card__meta .icon {
+  width: 17px;
+  height: 17px;
+}
+
+.student-quiz-card__start {
+  width: 100%;
+  min-height: 48px;
+  margin-bottom: var(--lip);
+}

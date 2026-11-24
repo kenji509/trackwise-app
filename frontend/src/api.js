@@ -74,3 +74,7 @@ export function register(user) {
 export function getSections() {
   return request('/section/api/getAllSections')
 }
+
+export function getQuizQuestions(quizId) {
+  return request(`/quiz/api/getQuizQuestions/${quizId}`)
+}

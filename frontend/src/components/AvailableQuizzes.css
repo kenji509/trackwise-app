@@ -1,0 +1,26 @@
+.available {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.available__heading {
+  width: fit-content;
+  margin-left: -4px;
+  padding: 0 4px;
+  font-size: 1.5rem;
+  background: linear-gradient(
+    transparent 58%,
+    var(--color-sunny-hover) 58%,
+    var(--color-sunny-hover) 92%,
+    transparent 92%
+  );
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.available__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: var(--space-5);
+}

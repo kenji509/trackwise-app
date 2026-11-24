@@ -1,0 +1,91 @@
+.confirm-dialog {
+  width: min(460px, calc(100% - 2 * var(--space-4)));
+  padding: var(--space-6);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-lg);
+}
+
+.confirm-dialog::backdrop {
+  background: var(--color-scrim);
+}
+
+.confirm-dialog[open] {
+  animation: confirm-dialog-in var(--duration-enter) var(--ease-out);
+}
+
+.confirm-dialog[open]::backdrop {
+  animation: confirm-dialog-fade var(--duration-enter) var(--ease-out);
+}
+
+@keyframes confirm-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+@keyframes confirm-dialog-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.confirm-dialog__title {
+  font-size: var(--text-xl);
+}
+
+.confirm-dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.confirm-dialog__body strong {
+  color: var(--color-text);
+}
+
+.confirm-dialog__warning {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) var(--space-3) var(--space-3);
+  border: 1px solid var(--color-sunny);
+  border-radius: var(--radius-sm);
+  background: var(--sunny-soft);
+  color: var(--sunny-ink);
+}
+
+.confirm-dialog__warning strong {
+  color: inherit;
+}
+
+.confirm-dialog__warning .icon {
+  margin-top: 2px;
+}
+
+.confirm-dialog__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+@media (max-width: 767px) {
+  .confirm-dialog {
+    padding: var(--space-5) var(--space-4) var(--space-4);
+  }
+
+  .confirm-dialog__buttons {
+    flex-direction: column-reverse;
+  }
+
+  .confirm-dialog__buttons .btn {
+    width: 100%;
+  }
+}
