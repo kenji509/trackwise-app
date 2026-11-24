@@ -1,0 +1,158 @@
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.toolbar__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.toolbar__search {
+  position: relative;
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.toolbar__search .icon {
+  position: absolute;
+  top: 50%;
+  left: var(--space-4);
+  translate: 0 -50%;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.toolbar__search-input {
+  width: 100%;
+  min-height: var(--touch-target);
+  padding: 0 var(--space-4) 0 calc(var(--space-4) + 20px + var(--space-2));
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.toolbar__search-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.toolbar__search-input:hover {
+  border-color: var(--color-text-muted);
+}
+
+.toolbar__search-input:focus-visible {
+  border-color: var(--color-primary);
+}
+
+.toolbar__status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  min-height: var(--touch-target);
+}
+
+.toolbar__count {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.toolbar__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Removable filter pill (from the 21st "Filter Toolbar" pattern) */
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 36px;
+  padding: 0 2px 0 var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-ink);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.filter-chip__remove {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+}
+
+/* 44px hit area */
+.filter-chip__remove::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+
+.filter-chip__remove:hover {
+  background: rgb(37 99 235 / 0.14);
+}
+
+.filter-chip__remove .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.toolbar__clear {
+  position: relative;
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  font-size: var(--text-sm);
+}
+
+/* 44px hit area */
+.toolbar__clear::after {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
+/* Tablet and phone: search on its own row, then the selects share the next
+   row(s) evenly instead of leaving ragged gaps */
+@media (max-width: 1100px) {
+  .toolbar__search {
+    flex-basis: 100%;
+  }
+
+  .toolbar__controls .select-field {
+    flex: 1 1 170px;
+  }
+
+  .toolbar__controls .select-field__control {
+    flex: 1;
+  }
+}
+
+/* Phone: selects two per row, toggle at the end */
+@media (max-width: 559px) {
+  .toolbar__controls .select-field {
+    flex: 1 1 calc(50% - var(--space-3));
+  }
+
+  .toolbar__controls .select-field__control {
+    flex: 1;
+  }
+}

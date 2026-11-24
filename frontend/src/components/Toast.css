@@ -1,0 +1,70 @@
+.toast-viewport {
+  position: fixed;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  z-index: var(--z-toast);
+  width: min(380px, calc(100% - 2 * var(--space-4)));
+  pointer-events: none;
+}
+
+/* Rounded card with a soft shadow and a mint check bubble */
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-2) var(--space-3) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  pointer-events: auto;
+  animation: toast-in var(--duration-enter) var(--ease-spring);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+.toast__icon {
+  box-sizing: content-box;
+  padding: 8px;
+  border-radius: 50%;
+  background: var(--mint-soft);
+  color: var(--mint-ink);
+}
+
+.toast__text {
+  flex: 1;
+  min-width: 0;
+  padding-top: 1px;
+}
+
+.toast__title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.toast__description {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Full 44px touch target; negative margin keeps the toast compact */
+.toast__close {
+  margin: -10px 0;
+}
+
+@media (max-width: 767px) {
+  .toast-viewport {
+    right: var(--space-4);
+    bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+    left: var(--space-4);
+    width: auto;
+  }
+}

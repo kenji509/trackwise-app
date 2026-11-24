@@ -1,0 +1,67 @@
+.topic-chips {
+  display: flex;
+  flex-wrap: wrap; /* wrap instead of clipping */
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.topic-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+/* Colored dot (topic name carries the meaning, the color is extra) */
+.topic-chip::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.topic-chip--more {
+  position: relative;
+  border: 0;
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.topic-chip--more::before {
+  display: none;
+}
+
+/* Larger touch area than the visible pill (44px tall) */
+.topic-chip--more::after {
+  content: '';
+  position: absolute;
+  inset: -10px -6px;
+}
+
+.topic-chip--more:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.topic-chips__empty {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-style: italic;
+}

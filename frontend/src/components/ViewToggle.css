@@ -1,0 +1,42 @@
+.view-toggle {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+}
+
+.view-toggle__button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-muted);
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+/* 44px-tall hit area around the 36px pill */
+.view-toggle__button::after {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
+.view-toggle__button:hover {
+  color: var(--color-text);
+}
+
+.view-toggle__button[aria-pressed='true'] {
+  background: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 2px 0 var(--color-primary-active);
+}

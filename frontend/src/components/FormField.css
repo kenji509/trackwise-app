@@ -1,0 +1,98 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.field__label {
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.field__required {
+  color: var(--color-danger);
+}
+
+/* 16px text prevents iOS from zooming into inputs */
+.field__control {
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-size: var(--text-base);
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.field__control:hover {
+  border-color: var(--color-text-muted);
+}
+
+/* Focus: the 2px blue ring from index.css plus a soft blue glow */
+.field__control:focus-visible {
+  border-color: var(--color-primary);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 5px rgb(37 99 235 / 0.14);
+}
+
+.field__control[aria-invalid='true'] {
+  border-color: var(--color-danger);
+  background-color: #fffafa;
+  box-shadow: inset 0 0 0 1px var(--color-danger); /* thicker edge without layout shift */
+}
+
+.field__control[aria-invalid='true']:focus-visible {
+  box-shadow:
+    inset 0 0 0 1px var(--color-danger),
+    0 0 0 5px rgb(220 38 38 / 0.12);
+}
+
+.field__control[aria-invalid='true']:focus-visible {
+  outline-color: var(--color-danger);
+}
+
+textarea.field__control {
+  min-height: 104px;
+  padding-top: var(--space-3);
+  resize: vertical;
+}
+
+/* Custom chevron for the select */
+select.field__control {
+  appearance: none;
+  padding-right: var(--space-7);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-position: right var(--space-3) center;
+  background-repeat: no-repeat;
+  background-size: 18px;
+}
+
+.field__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.field__counter {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.field__error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.field__error .icon {
+  width: 16px;
+  height: 16px;
+}

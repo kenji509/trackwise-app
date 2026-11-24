@@ -1,0 +1,194 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-6) var(--space-8);
+}
+
+/* Focused by the skip link; no ring needed on the whole page */
+.main:focus {
+  outline: none;
+}
+
+/* ===== Welcome banner: royal blue with a small classroom drawing ===== */
+.hero {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  overflow: hidden;
+  padding: var(--space-6) var(--space-7);
+  border-radius: var(--radius-lg);
+  background: var(--gradient-hero);
+  color: #ffffff; /* 5.17:1 on the lightest end */
+}
+
+/* Graph-paper dots, faded out before they reach the text */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgb(255 255 255 / 0.22) 1.4px, transparent 1.6px);
+  background-size: 20px 20px;
+  -webkit-mask-image: linear-gradient(to right, transparent 40%, #000 75%);
+  mask-image: linear-gradient(to right, transparent 40%, #000 75%);
+  pointer-events: none;
+}
+
+.hero__text,
+.hero__action {
+  position: relative; /* above the decorative shapes */
+}
+
+.hero__eyebrow {
+  color: #eff6ff; /* 4.75:1 on the gradient's lightest end */
+  font-weight: 700;
+}
+
+.hero__title {
+  margin: 2px 0 var(--space-1);
+  font-size: 2.5rem;
+  letter-spacing: -0.01em;
+}
+
+.hero__summary {
+  color: #eff6ff;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Decorative shapes (aria-hidden spans in MainContent.jsx).
+   They must never sit behind text: see the media query below. */
+.hero__blob {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Large soft circle in the top-right corner */
+.hero__blob--ring {
+  top: -110px;
+  right: -70px;
+  width: 280px;
+  height: 280px;
+  background: rgb(255 255 255 / 0.1);
+}
+
+/* Quiz sheet: blue title bar and three answer lines */
+.hero__blob--berry {
+  top: 22px;
+  right: 250px;
+  width: 132px;
+  height: 100px;
+  border-radius: 14px;
+  background:
+    linear-gradient(var(--color-primary) 0 0) 16px 18px / 44px 9px no-repeat,
+    linear-gradient(var(--color-border-strong) 0 0) 40px 42px / 74px 7px no-repeat,
+    linear-gradient(var(--color-border-strong) 0 0) 40px 62px / 58px 7px no-repeat,
+    linear-gradient(var(--color-border-strong) 0 0) 40px 82px / 66px 7px no-repeat,
+    #ffffff;
+  box-shadow: 0 12px 24px rgb(15 23 42 / 0.25);
+  transform: rotate(-7deg);
+}
+
+/* Two ticked boxes and one empty box on the sheet */
+.hero__blob--berry::before,
+.hero__blob--berry::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.hero__blob--berry::before {
+  top: 38px;
+  background: var(--mint-bright);
+  box-shadow: 0 20px 0 var(--mint-bright);
+}
+
+.hero__blob--berry::after {
+  top: 78px;
+  border: 2px solid var(--color-border-strong);
+}
+
+/* Sun */
+.hero__blob--sunny {
+  top: 10px;
+  right: 208px;
+  width: 54px;
+  height: 54px;
+  background: var(--color-sunny);
+  box-shadow:
+    0 0 0 9px rgb(250 204 21 / 0.28),
+    0 0 0 19px rgb(250 204 21 / 0.12);
+}
+
+/* "Correct" bubble with a check */
+.hero__blob--mint {
+  bottom: 18px;
+  right: 222px;
+  width: 36px;
+  height: 36px;
+  background: var(--mint-bright);
+  box-shadow: 0 6px 14px rgb(15 23 42 / 0.2);
+}
+
+.hero__blob--mint::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  width: 9px;
+  height: 15px;
+  border: solid #14532d;
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+
+/* The drawing would sit behind the text on narrower screens */
+@media (max-width: 1023px) {
+  .hero__blob--sunny,
+  .hero__blob--berry,
+  .hero__blob--mint {
+    display: none;
+  }
+
+  .main {
+    padding: var(--space-5) var(--space-5) var(--space-8);
+  }
+
+  .hero {
+    padding: var(--space-6);
+  }
+}
+
+@media (max-width: 767px) {
+  .main {
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-4) calc(var(--space-8) + env(safe-area-inset-bottom));
+  }
+
+  .hero {
+    padding: var(--space-5);
+  }
+
+  /* Dots only in the top-right corner, away from the text */
+  .hero::before {
+    -webkit-mask-image: linear-gradient(to bottom left, #000, transparent 60%);
+    mask-image: linear-gradient(to bottom left, #000, transparent 60%);
+  }
+
+  .hero__title {
+    font-size: 2rem;
+  }
+
+  .hero__action {
+    width: 100%;
+  }
+}

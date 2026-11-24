@@ -1,0 +1,132 @@
+.quizzes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.quizzes__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+
+/* Yellow highlighter swipe behind the heading (ink on yellow 11.10:1) */
+.quizzes__heading {
+  padding: 0 4px;
+  margin-left: -4px;
+  font-size: 1.5rem; /* 24px */
+  background: linear-gradient(
+    transparent 58%,
+    var(--color-sunny-hover) 58%,
+    var(--color-sunny-hover) 92%,
+    transparent 92%
+  );
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.quizzes__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: var(--space-5);
+}
+
+.quizzes__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ===== Empty states ===== */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-7) var(--space-5) var(--space-8);
+  border: 2px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  text-align: center;
+}
+
+/* Decorative drawing (inline SVG in Quizzes.jsx, aria-hidden) */
+.empty__art {
+  width: 220px;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 11 / 7;
+  margin-bottom: var(--space-1);
+}
+
+.empty__title {
+  font-size: var(--text-xl);
+  overflow-wrap: anywhere;
+}
+
+.empty__text {
+  max-width: 44ch;
+  color: var(--color-text-muted);
+}
+
+.empty__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+/* ===== Loading placeholders ===== */
+.skeleton-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  height: 260px;
+  padding: 0 var(--space-5) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.skeleton-card--list {
+  height: 76px;
+  padding: var(--space-4) var(--space-5);
+}
+
+.skeleton {
+  display: block;
+  height: 14px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-2);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.skeleton--band {
+  height: 60px;
+  margin: 0 calc(-1 * var(--space-5)) var(--space-2);
+  border-radius: 0;
+}
+
+.skeleton-card--list .skeleton--band,
+.skeleton-card--list .skeleton--chips {
+  display: none;
+}
+
+.skeleton--title {
+  width: 70%;
+  height: 20px;
+}
+
+.skeleton--short {
+  width: 45%;
+}
+
+.skeleton--chips {
+  width: 55%;
+  height: 24px;
+  margin-top: auto;
+}

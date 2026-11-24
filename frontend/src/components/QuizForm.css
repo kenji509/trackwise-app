@@ -1,0 +1,135 @@
+.dialog {
+  width: min(560px, calc(100% - 2 * var(--space-4)));
+  max-height: calc(100dvh - 2 * var(--space-5));
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-lg);
+}
+
+.dialog::backdrop {
+  background: var(--color-scrim);
+}
+
+.dialog[open] {
+  animation: dialog-in var(--duration-enter) var(--ease-out);
+}
+
+.dialog[open]::backdrop {
+  animation: fade-in var(--duration-enter) var(--ease-out);
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Pale blue header with a faint dot grid and a yellow clipboard tile */
+.dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-4) var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background-color: var(--color-primary-soft);
+  background-image: radial-gradient(rgb(37 99 235 / 0.14) 1.3px, transparent 1.5px);
+  background-size: 16px 16px;
+}
+
+/* Decorative clipboard tile (CSS only, no text, ignored by screen readers) */
+.dialog__header::before {
+  content: '';
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: var(--color-sunny)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231e293b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8' y='2' width='8' height='4' rx='1'/%3E%3Cpath d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'/%3E%3Cpath d='m9 14 2 2 4-4'/%3E%3C/svg%3E")
+    center / 24px no-repeat;
+  box-shadow: 0 var(--lip) 0 var(--color-sunny-lip);
+}
+
+.dialog__header > div {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Title with a yellow highlighter swipe (ink on yellow 11.10:1) */
+.dialog__title {
+  display: inline;
+  margin-left: -4px;
+  padding: 0 4px;
+  font-size: 1.625rem; /* 26px */
+  background: linear-gradient(
+    transparent 60%,
+    var(--color-sunny-hover) 60%,
+    var(--color-sunny-hover) 92%,
+    transparent 92%
+  );
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.dialog__subtitle {
+  margin-top: 2px;
+  color: var(--color-text-muted); /* 6.68:1 on primary-soft */
+  font-size: var(--text-sm);
+}
+
+.dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-6) 0;
+}
+
+/* Mobile: bottom sheet */
+@media (max-width: 767px) {
+  .dialog {
+    width: 100%;
+    max-width: none;
+    max-height: calc(100dvh - var(--space-6));
+    margin: auto 0 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .dialog[open] {
+    animation: sheet-in var(--duration-enter) var(--ease-out);
+  }
+
+  .dialog__header {
+    padding: var(--space-4) var(--space-3) var(--space-3) var(--space-4);
+  }
+
+  .dialog__header::before {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+  }
+
+  .dialog__title {
+    font-size: var(--text-xl);
+  }
+
+  .dialog__body {
+    padding: var(--space-4) var(--space-4) 0;
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}

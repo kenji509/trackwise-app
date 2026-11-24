@@ -1,0 +1,60 @@
+/* Pill with the label on the left; the native select fills the rest */
+.select-field {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  min-height: var(--touch-target);
+  padding-left: var(--space-4);
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.select-field:hover {
+  border-color: var(--color-text-muted);
+}
+
+/* Show the focus ring on the pill, not the hidden select edge */
+.select-field:has(.select-field__control:focus-visible) {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.select-field__label {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.select-field__control {
+  min-width: 0;
+  min-height: var(--touch-target); /* full 44px: overlaps the pill's 1px border */
+  margin: -1px 0;
+  padding: 0 calc(var(--space-4) + 20px) 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  appearance: none;
+}
+
+.select-field__control:focus-visible {
+  outline: none; /* the pill shows the ring */
+}
+
+.select-field__chevron {
+  position: absolute;
+  right: var(--space-3);
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}

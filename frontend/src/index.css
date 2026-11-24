@@ -1,0 +1,495 @@
+/* =========================================================
+   TrackWise design tokens: "Sunny Classroom"
+   Source of truth: design-system/trackwise/MASTER.md
+   Light mode only (approved 2026-11-22). Look approved 2026-11-24.
+   Royal blue does the work, sunny yellow adds the cheer.
+   Fonts: Nunito (headings) + DM Sans (body)
+   ========================================================= */
+:root {
+  /* Brand: royal blue */
+  --color-primary: #2563eb; /* white on it 5.17:1; as text on white 5.17:1 */
+  --color-primary-hover: #1d4ed8; /* white 6.70:1 */
+  --color-primary-active: #1e40af; /* white 8.72:1; also the button "lip" */
+  --color-primary-soft: #eaf1ff;
+  --color-primary-ink: #1e40af; /* text on primary-soft (7.69:1) */
+  --color-on-primary: #ffffff;
+  --gradient-hero: linear-gradient(120deg, #2563eb 0%, #1d4ed8 70%, #1e40af 100%);
+
+  /* Brand accent: sunny yellow. Fills only, always with dark ink on top
+     (9.55:1). Never use it for text or meaningful marks on white (1.53:1). */
+  --color-sunny: #facc15;
+  --color-sunny-hover: #fde047; /* also the heading highlighter; ink 11.10:1 */
+  --color-sunny-lip: #ca8a04;
+  --color-on-sunny: #1e293b;
+
+  /* Card and topic accents.
+     soft = background, ink = text (4.5:1+ on soft and white),
+     solid = dots next to text (3:1+ on white), bright = decoration only */
+  --coral-soft: #ffe4e6;
+  --coral-ink: #9f1239;
+  --coral: #e11d48;
+  --coral-bright: #fb7185;
+  --sunny-soft: #fef9c3;
+  --sunny-ink: #854d0e;
+  --sunny: #a16207;
+  --sunny-bright: #facc15;
+  --mint-soft: #dcfce7;
+  --mint-ink: #166534;
+  --mint: #16a34a;
+  --mint-bright: #4ade80;
+  --grape-soft: #ede9fe;
+  --grape-ink: #5b21b6;
+  --grape: #7c3aed;
+  --grape-bright: #a78bfa;
+
+  /* Status */
+  --color-danger: #b91c1c; /* text: 6.47:1 on white */
+  --color-danger-solid: #dc2626; /* fill: white 4.83:1 */
+  --color-danger-hover: #b91c1c;
+  --color-danger-soft: #fef2f2;
+  --color-danger-line: #fecaca; /* decorative edges of error areas */
+  --color-on-danger: #ffffff;
+  --color-draft-soft: var(--color-sunny); /* Draft badge: yellow, dark ink */
+  --color-draft-ink: var(--color-on-sunny);
+
+  /* Neutrals: cool slate, tinted toward the blue */
+  --color-bg: #f4f7fe;
+  --color-surface: #ffffff;
+  --color-surface-2: #eef2fa;
+  --color-surface-hover: #e4eaf6;
+  --color-text: #1e293b;
+  --color-text-muted: #475569; /* 7.58:1 white, 7.07:1 bg */
+  --color-border: #e2e8f0; /* decorative */
+  --color-border-strong: #cbd5e1; /* decorative, dashed empty-state edge */
+  --color-border-input: #7c8ba1; /* controls: 3.46:1 on white, 3.23:1 on bg */
+  --color-scrim: rgb(15 23 42 / 0.5);
+
+  /* Typography */
+  --font-sans: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Nunito', 'DM Sans', system-ui, sans-serif;
+  --text-xs: 0.75rem;   /* 12px */
+  --text-sm: 0.875rem;  /* 14px */
+  --text-base: 1rem;    /* 16px */
+  --text-lg: 1.125rem;  /* 18px */
+  --text-xl: 1.375rem;  /* 22px */
+  --text-2xl: 1.75rem;  /* 28px */
+  --text-3xl: 2.125rem; /* 34px */
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+
+  /* Spacing: 4/8 grid */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 40px;
+  --space-8: 48px;
+
+  /* Shape: rounded, soft blue-tinted shadows */
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px rgb(15 23 42 / 0.05), 0 2px 8px rgb(37 99 235 / 0.06);
+  --shadow-md: 0 14px 30px rgb(37 99 235 / 0.14);
+  --shadow-lg: 0 20px 48px rgb(15 23 42 / 0.18);
+  /* Pressable "lip" under filled buttons; it shrinks when pressed */
+  --lip: 3px;
+  --lip-pressed: 1px;
+
+  /* Motion */
+  --duration-fast: 150ms;
+  --duration-base: 220ms;
+  --duration-enter: 320ms;
+  --duration-exit: 180ms;
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Layers */
+  --z-menu: 30;
+  --z-sticky: 20;
+  --z-toast: 60;
+  --z-skip: 100;
+
+  /* Layout */
+  --appbar-height: 60px;
+  --sidebar-width: 248px;
+  --rail-width: 88px;
+  --touch-target: 44px;
+
+  color-scheme: light;
+}
+
+/* Accent helpers: set --accent / --accent-soft / --accent-ink / --accent-bright
+   on an element. Blue is for quizzes with no topics yet. */
+.accent-primary {
+  --accent: var(--color-primary);
+  --accent-soft: var(--color-primary-soft);
+  --accent-ink: var(--color-primary-ink);
+  --accent-bright: #60a5fa;
+}
+.accent-coral {
+  --accent: var(--coral);
+  --accent-soft: var(--coral-soft);
+  --accent-ink: var(--coral-ink);
+  --accent-bright: var(--coral-bright);
+}
+.accent-sunny {
+  --accent: var(--sunny);
+  --accent-soft: var(--sunny-soft);
+  --accent-ink: var(--sunny-ink);
+  --accent-bright: var(--sunny-bright);
+}
+.accent-mint {
+  --accent: var(--mint);
+  --accent-soft: var(--mint-soft);
+  --accent-ink: var(--mint-ink);
+  --accent-bright: var(--mint-bright);
+}
+.accent-grape {
+  --accent: var(--grape);
+  --accent-soft: var(--grape-soft);
+  --accent-ink: var(--grape-ink);
+  --accent-bright: var(--grape-bright);
+}
+
+/* ===== Base ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Keep focused elements clear of the sticky mobile app bar */
+  scroll-padding-top: calc(var(--appbar-height) + var(--space-4));
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p,
+dl,
+dd {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: var(--leading-tight);
+  text-wrap: balance;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button,
+a,
+select {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* Visible focus ring for keyboard users only */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Hide visually but keep for screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Shared SVG icon style (outline icons, 24px grid) */
+.icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Brand logo: sunny yellow tile, ink trend line (9.55:1) */
+.logo {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+}
+
+.logo rect {
+  fill: var(--color-sunny);
+}
+
+.logo path {
+  fill: none;
+  stroke: var(--color-on-sunny);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Round avatar with initials or an icon */
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-ink);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.avatar .icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* ===== Buttons ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target);
+  padding: 0 var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out),
+    transform var(--duration-base) var(--ease-spring);
+}
+
+/* Springy press (scale only, so layout never moves) */
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Filled buttons sit on a darker "lip" and press down into it */
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: 0 var(--lip) 0 var(--color-primary-active);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.btn-primary:active:not(:disabled) {
+  background: var(--color-primary-active);
+  box-shadow: 0 var(--lip-pressed) 0 var(--color-primary-active);
+  transform: translateY(calc(var(--lip) - var(--lip-pressed)));
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border-input);
+  box-shadow: 0 2px 0 var(--color-border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-surface-2);
+}
+
+/* Main action on the blue hero: sunny yellow with dark ink (9.55:1).
+   Its edge is 3.38:1 against the blue; the focus ring is white (5.17:1). */
+.btn-light {
+  background: var(--color-sunny);
+  color: var(--color-on-sunny);
+  box-shadow: 0 var(--lip) 0 var(--color-sunny-lip);
+}
+
+.btn-light:hover:not(:disabled) {
+  background: var(--color-sunny-hover);
+}
+
+.btn-light:active:not(:disabled) {
+  box-shadow: 0 var(--lip-pressed) 0 var(--color-sunny-lip);
+  transform: translateY(calc(var(--lip) - var(--lip-pressed)));
+}
+
+.btn-light:focus-visible {
+  outline-color: #ffffff;
+}
+
+/* Disabled on the banner (loading / server down): ghosted white instead of
+   half-transparent yellow, which turns olive over the blue */
+.btn-light:disabled {
+  opacity: 1;
+  background: rgb(255 255 255 / 0.18);
+  color: rgb(255 255 255 / 0.85);
+  box-shadow: none;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-primary);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--color-primary-soft);
+}
+
+/* Solid danger (confirm delete / discard) */
+.btn-danger-solid {
+  background: var(--color-danger-solid);
+  color: var(--color-on-danger);
+}
+
+.btn-danger-solid:hover:not(:disabled) {
+  background: var(--color-danger-hover);
+}
+
+.btn-danger-solid:focus-visible {
+  outline-color: var(--color-danger);
+}
+
+/* Round icon-only button (always give it an aria-label) */
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-muted);
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.icon-btn:hover:not(:disabled) {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+
+.icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Error message box (server errors stay until fixed) */
+.alert {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-danger-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+/* ===== App shell ===== */
+.app {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  min-height: 100dvh;
+}
+
+.app[data-nav='collapsed'] {
+  grid-template-columns: var(--rail-width) minmax(0, 1fr);
+}
+
+.app__column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Tablet: always a labeled rail */
+@media (max-width: 1023px) {
+  .app,
+  .app[data-nav='collapsed'] {
+    grid-template-columns: var(--rail-width) minmax(0, 1fr);
+  }
+}
+
+/* Mobile: app bar + drawer, no sidebar column */
+@media (max-width: 767px) {
+  .app,
+  .app[data-nav='collapsed'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Hidden until a keyboard user tabs to it */
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: var(--space-4);
+  z-index: var(--z-skip);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: var(--space-3);
+}
+
+/* Respect users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

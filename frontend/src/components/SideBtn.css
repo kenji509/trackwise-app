@@ -1,0 +1,70 @@
+/* Used in the desktop sidebar and in the mobile drawer (Header) */
+.side-btn {
+  --side-btn-edge: #c5d6fb; /* darker tint of primary-soft; decorative */
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 48px;
+  margin-bottom: 3px; /* room for the active item's bottom edge */
+  padding: 0 var(--space-3) 0 var(--space-2);
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted); /* 7.58:1 on white */
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.side-btn:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text); /* 13.04:1 */
+}
+
+/* Round icon bubble; filled blue when active */
+.side-btn__icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+/* Active: soft blue pill on a 3px darker edge, like the pressable buttons.
+   Text 7.69:1 on primary-soft; white icon 5.17:1 on the blue bubble. */
+.side-btn[aria-current='page'] {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-ink);
+  box-shadow: 0 3px 0 var(--side-btn-edge);
+}
+
+.side-btn[aria-current='page'] .side-btn__icon {
+  background: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 2px 0 var(--color-primary-active);
+}
+
+/* Rail (collapsed sidebar and tablet): icon only. The label stays in the
+   link for screen readers, and the title attribute shows it as a tooltip. */
+@container sidebar (max-width: 160px) {
+  .side-btn {
+    justify-content: center;
+    min-height: 52px;
+    padding: var(--space-2);
+    border-radius: var(--radius-md);
+  }
+
+  .side-btn__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}

@@ -1,0 +1,171 @@
+/* The aside is a size container so the rail styles work for both the
+   user-collapsed desktop sidebar and the tablet rail. */
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  container: sidebar / inline-size;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+}
+
+.sidebar__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  height: 100%;
+  padding: var(--space-5) var(--space-3);
+  overflow-y: auto;
+}
+
+/* Logo area: pale-blue panel with a soft graph-paper dot grid.
+   Brand name 12.90:1 between dots, 10.71:1 on a dot centre. */
+.sidebar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-1) var(--space-3) 10px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-primary-soft);
+  background-image: radial-gradient(rgb(37 99 235 / 0.14) 1.3px, transparent 1.5px);
+  background-position: 8px 8px;
+  background-size: 16px 16px;
+}
+
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: 1.25rem; /* 20px: fits beside the 40px logo and the toggle */
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+/* Bigger yellow logo tile sitting on a 3px darker edge, like the buttons */
+.sidebar__brand .logo {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 3px; /* room for the edge, keeps the tile visually centred */
+  filter: drop-shadow(0 3px 0 var(--color-sunny-lip));
+}
+
+/* Collapse button on the blue panel: white disc on hover (icon 6.68:1) */
+.sidebar__toggle:hover:not(:disabled) {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.sidebar__nav {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Signed-in user: rounded footer card with a yellow avatar circle */
+.sidebar__user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  box-shadow: var(--shadow-sm);
+}
+
+.sidebar__user .avatar {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 2px;
+  background: var(--color-sunny);
+  color: var(--color-on-sunny); /* 9.55:1 */
+  box-shadow: 0 2px 0 var(--color-sunny-lip);
+}
+
+.sidebar__user-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.sidebar__user-name {
+  font-size: var(--text-sm);
+  font-weight: 700; /* 13.64:1 on the card */
+}
+
+.sidebar__user-role {
+  color: var(--color-text-muted); /* 7.07:1 on the card */
+  font-size: var(--text-xs);
+}
+
+/* ===== Expanded sidebar only (wider than 160px) ===== */
+@container sidebar (min-width: 161px) {
+  /* Section label ("TEACHING") with a yellow highlighter swipe underneath.
+     Ink text: 11.10:1 on the yellow, 14.63:1 on white. The rail hides this
+     label visually (SideSection.css), so the swipe is never drawn there. */
+  .sidebar__nav .side-section__label {
+    width: fit-content;
+    margin: 0 0 var(--space-2) var(--space-2);
+    padding: 0 var(--space-1);
+    color: var(--color-text);
+    line-height: 1.6;
+    background: linear-gradient(
+      transparent 52%,
+      var(--color-sunny-hover) 52%,
+      var(--color-sunny-hover) 94%,
+      transparent 94%
+    );
+  }
+}
+
+/* ===== Rail (sidebar narrower than 160px) ===== */
+@container sidebar (max-width: 160px) {
+  .sidebar__inner {
+    padding: var(--space-5) var(--space-2);
+  }
+
+  .sidebar__header {
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-3) 0 var(--space-2);
+    background-position: 4px 6px;
+  }
+
+  .sidebar__brand-name,
+  .sidebar__user-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* Just the avatar circle in the rail */
+  .sidebar__user {
+    justify-content: center;
+    padding: var(--space-2) 0;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+}
+
+/* Tablet: always a rail, so there is nothing to toggle */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .sidebar__toggle {
+    display: none;
+  }
+}
+
+/* Mobile: the drawer in Header replaces the sidebar */
+@media (max-width: 767px) {
+  .sidebar {
+    display: none;
+  }
+}

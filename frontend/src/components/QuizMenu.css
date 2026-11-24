@@ -1,0 +1,77 @@
+.quiz-menu {
+  position: relative;
+}
+
+.quiz-menu__button {
+  color: var(--accent-ink, var(--color-text-muted));
+}
+
+/* Solid white disc + small shadow: visible on the colored band and on white rows */
+.quiz-menu__button:hover:not(:disabled),
+.quiz-menu__button[aria-expanded='true'] {
+  background: var(--color-surface);
+  box-shadow: 0 1px 4px rgb(15 23 42 / 0.14);
+  color: var(--accent-ink, var(--color-text));
+}
+
+.quiz-menu__list {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: var(--z-menu);
+  min-width: 184px;
+  padding: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  transform-origin: top right;
+  animation: menu-pop var(--duration-enter) var(--ease-spring);
+}
+
+@keyframes menu-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+.quiz-menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--touch-target);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  font-weight: 500;
+  text-align: left;
+}
+
+.quiz-menu__item:hover,
+.quiz-menu__item:focus-visible {
+  background: var(--color-surface-2);
+}
+
+.quiz-menu__item:focus-visible {
+  outline-offset: -2px;
+}
+
+.quiz-menu__item--danger {
+  color: var(--color-danger);
+}
+
+.quiz-menu__item--danger:hover,
+.quiz-menu__item--danger:focus-visible {
+  background: var(--color-danger-soft);
+  outline-color: var(--color-danger);
+}
+
+.quiz-menu__separator {
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--color-border);
+}
