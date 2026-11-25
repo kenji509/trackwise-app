@@ -1,4 +1,4 @@
-.quiz-submitted {
+.result-status {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -11,7 +11,7 @@
   text-align: center;
 }
 
-.quiz-submitted__art {
+.result-status__art {
   width: 220px;
   max-width: 100%;
   height: auto;
@@ -19,7 +19,7 @@
   margin-bottom: var(--space-1);
 }
 
-.quiz-submitted__title {
+.result-status__title {
   padding: 0 4px;
   font-size: var(--text-2xl);
   background: linear-gradient(
@@ -32,11 +32,11 @@
   box-decoration-break: clone;
 }
 
-.quiz-submitted__title:focus {
+.result-status__title:focus {
   outline: none;
 }
 
-.quiz-submitted__note {
+.result-status__note {
   max-width: 40ch;
   padding: var(--space-2) var(--space-4);
   border: 1px solid var(--color-sunny);
@@ -47,47 +47,55 @@
   font-weight: 500;
 }
 
-.quiz-submitted__answered {
-  display: flex;
-  flex-direction: column;
+.result-status__message {
+  display: inline-flex;
   align-items: center;
-  margin-top: var(--space-2);
-}
-
-.quiz-submitted__number {
-  font-family: var(--font-display);
-  font-size: 3rem;
-  font-weight: 800;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.quiz-submitted__total {
-  color: var(--color-text-muted);
-  font-size: 1.75rem;
-}
-
-.quiz-submitted__label {
+  gap: var(--space-2);
   color: var(--color-text-muted);
   font-weight: 700;
 }
 
-.quiz-submitted__done {
-  margin-top: var(--space-4);
+.result-status__spinner {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border: 3px solid var(--color-primary-soft);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: result-status-spin 0.8s linear infinite;
+}
+
+@keyframes result-status-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.result-status__error {
+  max-width: 44ch;
+}
+
+.result-status__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
   margin-bottom: var(--lip);
 }
 
 @media (max-width: 767px) {
-  .quiz-submitted {
+  .result-status {
     padding: var(--space-6) var(--space-4) var(--space-7);
     border-radius: var(--radius-md);
   }
 
-  .quiz-submitted__title {
+  .result-status__title {
     font-size: var(--text-xl);
   }
 
-  .quiz-submitted__done {
-    width: 100%;
+  .result-status__actions {
+    flex-direction: column;
+    align-self: stretch;
   }
 }

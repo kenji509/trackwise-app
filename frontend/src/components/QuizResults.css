@@ -1,0 +1,220 @@
+.quiz-results {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: stretch;
+  gap: var(--space-5);
+}
+
+.quiz-results__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.quiz-results__score {
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.quiz-results__review,
+.quiz-results__done {
+  grid-column: 1 / -1;
+}
+
+.quiz-results__title {
+  padding: 0 4px;
+  font-size: var(--text-2xl);
+  background: linear-gradient(
+    transparent 60%,
+    var(--color-sunny-hover) 60%,
+    var(--color-sunny-hover) 92%,
+    transparent 92%
+  );
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.quiz-results__title:focus {
+  outline: none;
+}
+
+.quiz-results__submitted {
+  margin-top: calc(-1 * var(--space-2));
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.quiz-results__note {
+  max-width: 40ch;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-sunny);
+  border-radius: var(--radius-sm);
+  background: var(--sunny-soft);
+  color: var(--sunny-ink);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.quiz-results__ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 176px;
+  aspect-ratio: 1;
+  margin-top: var(--space-2);
+}
+
+.quiz-results__ring-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.quiz-results__ring-track,
+.quiz-results__ring-fill {
+  fill: none;
+  stroke-width: 12;
+}
+
+.quiz-results__ring-track {
+  stroke: var(--color-surface-2);
+}
+
+.quiz-results__ring-fill {
+  stroke: var(--color-primary);
+  stroke-linecap: round;
+}
+
+.quiz-results__score-text {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.quiz-results__number {
+  font-family: var(--font-display);
+  font-size: 2.75rem;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.quiz-results__out-of {
+  color: var(--color-text-muted);
+  font-size: 1.5rem;
+}
+
+.quiz-results__percent {
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-sunny);
+  color: var(--color-on-sunny);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.quiz-results__message {
+  max-width: 36ch;
+  font-weight: 500;
+}
+
+.quiz-results__counts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quiz-results__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 8px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.quiz-results__count .icon {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.6;
+}
+
+.quiz-results__count--correct {
+  background: var(--mint-soft);
+  color: var(--mint-ink);
+}
+
+.quiz-results__count--wrong {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.quiz-results__count--unanswered {
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
+}
+
+.quiz-results__heading {
+  font-size: var(--text-lg);
+}
+
+.quiz-results__done {
+  justify-self: center;
+  min-width: 240px;
+  margin-bottom: var(--lip);
+}
+
+@media (max-width: 1023px) {
+  .quiz-results {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .quiz-results {
+    gap: var(--space-4);
+  }
+
+  .quiz-results__card {
+    padding: var(--space-5) var(--space-4);
+    border-radius: var(--radius-md);
+  }
+
+  .quiz-results__title {
+    font-size: var(--text-xl);
+  }
+
+  .quiz-results__ring {
+    width: 152px;
+  }
+
+  .quiz-results__number {
+    font-size: 2.25rem;
+  }
+
+  .quiz-results__out-of {
+    font-size: 1.25rem;
+  }
+
+  .quiz-results__done {
+    justify-self: stretch;
+    min-width: 0;
+  }
+}

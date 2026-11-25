@@ -1,4 +1,4 @@
-import { filterAndSort, plural } from './quizData.js'
+import { filterAndSort, plural, topicAccent } from './quizData.js'
 
 export function availableQuizViews(views) {
   const playable = views.filter((view) => view.questionCount > 0)
@@ -7,7 +7,79 @@ export function availableQuizViews(views) {
 
 export function createAttempt(quiz, questions) {
   const totalSeconds = quiz.timeLimitMin * 60
-  return { quiz, questions, totalSeconds, deadline: Date.now() + totalSeconds * 1000 }
+  const startedAt = Date.now()
+  return { quiz, questions, totalSeconds, startedAt, deadline: startedAt + totalSeconds * 1000 }
+}
+
+function localDateTime(time) {
+  const date = new Date(time)
+  const day = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+  return `${day}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+}
+
+export function toAttemptBody(attempt, answers, studentId) {
+  return {
+    quiz: { quizId: attempt.quiz.quizId },
+    student: { userId: studentId },
+    startedAt: localDateTime(attempt.startedAt),
+    answers: attempt.questions.map((question) => {
+      const choiceId = answers[question.questionId]
+      return {
+        question: { questionId: question.questionId },
+        choice: choiceId == null ? null : { choiceId },
+      }
+    }),
+  }
+}
+
+export function answerStatus(answer) {
+  if (answer.correct) return 'correct'
+  return answer.choice ? 'wrong' : 'unanswered'
+}
+
+export function resultSummary(result) {
+  const answers = result.answers || []
+  const topics = new Map()
+  let wrong = 0
+  let unanswered = 0
+
+  for (const answer of answers) {
+    const status = answerStatus(answer)
+    if (status === 'wrong') wrong += 1
+    if (status === 'unanswered') unanswered += 1
+
+    const topic = answer.question?.topic
+    if (!topic) continue
+    const current = topics.get(topic.topicId) || { topicId: topic.topicId, name: topic.name, correct: 0, total: 0 }
+    topics.set(topic.topicId, {
+      ...current,
+      correct: current.correct + (status === 'correct' ? 1 : 0),
+      total: current.total + 1,
+    })
+  }
+
+  const total = answers.length
+  return {
+    score: result.score,
+    total,
+    percent: total > 0 ? Math.round((result.score / total) * 100) : 0,
+    wrong,
+    unanswered,
+    topics: [...topics.values()]
+      .map((topic) => ({
+        ...topic,
+        accent: topicAccent(topic.topicId),
+        percent: Math.round((topic.correct / topic.total) * 100),
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name)),
+  }
+}
+
+export function resultMessage(percent) {
+  if (percent === 100) return 'Perfect score! Every answer is correct.'
+  if (percent >= 80) return 'Great work! Check the few you missed below.'
+  if (percent >= 50) return 'Good effort. Review the questions you missed below.'
+  return 'Keep practicing. The answers below show where to focus next.'
 }
 
 export function choiceLetter(index) {

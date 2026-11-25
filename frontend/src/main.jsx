@@ -1,4 +1,4 @@
-import { StrictMode, useEffect, useState } from 'react'
+import { StrictMode, useEffect, useEffectEvent, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { createRoot } from 'react-dom/client'
 import './index.css'
@@ -28,7 +28,8 @@ import QuizTimer from './components/QuizTimer.jsx'
 import QuestionCard from './components/QuestionCard.jsx'
 import QuestionNavigator from './components/QuestionNavigator.jsx'
 import ConfirmDialog from './components/ConfirmDialog.jsx'
-import QuizSubmitted from './components/QuizSubmitted.jsx'
+import QuizResults from './components/QuizResults.jsx'
+import ResultStatus from './components/ResultStatus.jsx'
 import * as api from './api.js'
 import { emptyForm, toForm, toRequestBody, validateQuiz } from './quizForm.js'
 import {
@@ -49,6 +50,7 @@ import {
   createAttempt,
   listNumbers,
   secondsUntil,
+  toAttemptBody,
 } from './quizAttempt.js'
 import {
   SORT_OPTIONS,
@@ -118,6 +120,21 @@ function readStoredUser() {
 
 function focusById(id) {
   document.getElementById(id)?.focus()
+}
+
+const RESULT_HASH = /^#results\/(\d+)$/
+
+function readResultId() {
+  const match = window.location.hash.match(RESULT_HASH)
+  return match ? Number(match[1]) : null
+}
+
+function showResultUrl(attemptId) {
+  window.history.pushState(null, '', `#results/${attemptId}`)
+}
+
+function clearResultUrl() {
+  window.history.pushState(null, '', window.location.pathname + window.location.search)
 }
 
 // "Now" for the greeting and "this week". Set when data arrives (not during
@@ -634,9 +651,20 @@ function StudentApp({ user, onLogout }) {
   const [secondsLeft, setSecondsLeft] = useState(0)
   const [confirming, setConfirming] = useState(null)
   const [finished, setFinished] = useState(null)
+  const [submitError, setSubmitError] = useState('')
+  const [result, setResult] = useState(null)
+  const [resultId, setResultId] = useState(readResultId)
+  const [resultError, setResultError] = useState('')
+  const [resultLoad, setResultLoad] = useState(0)
+  const [timedOutId, setTimedOutId] = useState(null)
 
   const taking = attempt !== null && finished === null
   const deadline = attempt ? attempt.deadline : 0
+  const resultReady = result !== null && result.attemptId === resultId
+
+  let screenTitle = 'Available Quizzes'
+  if (resultId !== null) screenTitle = resultReady ? `Results: ${result.quiz.title}` : 'Results'
+  if (attempt) screenTitle = attempt.quiz.title
 
   useEffect(() => {
     let ignore = false
@@ -661,8 +689,42 @@ function StudentApp({ user, onLogout }) {
   }, [loadAttempt])
 
   useEffect(() => {
-    document.title = `${attempt ? attempt.quiz.title : 'Available Quizzes'} · TrackWise`
-  }, [attempt])
+    document.title = `${screenTitle} · TrackWise`
+  }, [screenTitle])
+
+  useEffect(() => {
+    function followUrl() {
+      setResultId(readResultId())
+      setResultError('')
+    }
+
+    window.addEventListener('hashchange', followUrl)
+    return () => window.removeEventListener('hashchange', followUrl)
+  }, [])
+
+  useEffect(() => {
+    if (resultId === null || resultReady) return
+    let ignore = false
+
+    api
+      .getAttempt(resultId)
+      .then((saved) => {
+        if (ignore) return
+        if (saved.student?.userId !== user.userId) {
+          throw new Error('This result belongs to another student.')
+        }
+        setResult(saved)
+      })
+      .catch((error) => {
+        if (!ignore) setResultError(error.message)
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [resultId, resultReady, resultLoad, user.userId])
+
+  const onTimeUp = useEffectEvent(() => finishQuiz('time'))
 
   useEffect(() => {
     if (!taking) return
@@ -670,21 +732,16 @@ function StudentApp({ user, onLogout }) {
     const timer = setInterval(() => {
       const left = secondsUntil(deadline, Date.now())
       setSecondsLeft(left)
-      if (left > 0) return
-
-      flushSync(() => {
-        setConfirming(null)
-        setFinished('time')
-      })
-      window.scrollTo(0, 0)
-      focusById('quiz-result-title')
+      if (left === 0) onTimeUp()
     }, 250)
 
     return () => clearInterval(timer)
   }, [taking, deadline])
 
+  const unsaved = attempt !== null
+
   useEffect(() => {
-    if (!taking) return
+    if (!unsaved) return
 
     function warnBeforeLeaving(event) {
       event.preventDefault()
@@ -693,7 +750,7 @@ function StudentApp({ user, onLogout }) {
 
     window.addEventListener('beforeunload', warnBeforeLeaving)
     return () => window.removeEventListener('beforeunload', warnBeforeLeaving)
-  }, [taking])
+  }, [unsaved])
 
   function retryLoad() {
     setLoading(true)
@@ -744,13 +801,38 @@ function StudentApp({ user, onLogout }) {
     setMarked({ ...marked, [questionId]: !marked[questionId] })
   }
 
-  function submitQuiz() {
+  function finishQuiz(reason) {
+    if (finished) return
     flushSync(() => {
       setConfirming(null)
-      setFinished('submitted')
+      setFinished(reason)
+      setSubmitError('')
     })
     window.scrollTo(0, 0)
     focusById('quiz-result-title')
+    sendAttempt(reason)
+  }
+
+  async function sendAttempt(reason) {
+    setSubmitError('')
+    try {
+      const saved = await api.submitAttempt(toAttemptBody(attempt, answers, user.userId))
+      showResultUrl(saved.attemptId)
+      flushSync(() => {
+        setResult(saved)
+        setResultId(saved.attemptId)
+        setResultError('')
+        setTimedOutId(reason === 'time' ? saved.attemptId : null)
+        setAttempt(null)
+        setFinished(null)
+        setAnswers({})
+        setMarked({})
+      })
+      window.scrollTo(0, 0)
+      focusById('quiz-result-title')
+    } catch (error) {
+      setSubmitError(error.message)
+    }
   }
 
   function leaveQuiz() {
@@ -758,6 +840,7 @@ function StudentApp({ user, onLogout }) {
       setConfirming(null)
       setAttempt(null)
       setFinished(null)
+      setSubmitError('')
       setAnswers({})
       setMarked({})
     })
@@ -765,17 +848,59 @@ function StudentApp({ user, onLogout }) {
     focusById('main')
   }
 
+  function backToQuizzes() {
+    clearResultUrl()
+    flushSync(() => {
+      setResultId(null)
+      setResultError('')
+    })
+    window.scrollTo(0, 0)
+    focusById('main')
+  }
+
+  function retryResult() {
+    setResultError('')
+    setResultLoad(resultLoad + 1)
+  }
+
   if (attempt && finished) {
-    const summary = attemptSummary(attempt.questions, answers, marked)
+    const timedOut = finished === 'time'
+    const timeUpNote = timedOut ? 'The timer reached 00:00, so your quiz was submitted automatically.' : ''
+
     return (
-      <QuizLayout title={attempt.quiz.title}>
-        <QuizSubmitted
-          answered={summary.answeredCount}
-          total={summary.total}
-          timedOut={finished === 'time'}
-          onDone={leaveQuiz}
-        />
-      </QuizLayout>
+      <>
+        <QuizLayout title={attempt.quiz.title}>
+          {submitError ? (
+            <ResultStatus title="Your quiz isn’t saved yet" note={timeUpNote} error={submitError}>
+              <button type="button" className="btn btn-primary" onClick={() => sendAttempt(finished)}>
+                Try again
+              </button>
+              <button type="button" className="btn btn-secondary" onClick={() => setConfirming('exit')}>
+                Exit without saving
+              </button>
+            </ResultStatus>
+          ) : (
+            <ResultStatus
+              busy
+              title={timedOut ? 'Time’s up! Quiz submitted' : 'Quiz submitted'}
+              note={timeUpNote}
+              message="Checking your answers…"
+            />
+          )}
+        </QuizLayout>
+
+        <ConfirmDialog
+          open={confirming === 'exit'}
+          title="Exit without saving?"
+          cancelLabel="Stay here"
+          confirmLabel="Exit quiz"
+          danger
+          onConfirm={leaveQuiz}
+          onCancel={() => setConfirming(null)}
+        >
+          <p>Your answers won’t be saved. You’ll go back to Available Quizzes.</p>
+        </ConfirmDialog>
+      </>
     )
   }
 
@@ -835,7 +960,7 @@ function StudentApp({ user, onLogout }) {
           title="Submit quiz?"
           cancelLabel="Keep working"
           confirmLabel="Submit quiz"
-          onConfirm={submitQuiz}
+          onConfirm={() => finishQuiz('submitted')}
           onCancel={() => setConfirming(null)}
         >
           {unansweredCount > 0 ? (
@@ -873,6 +998,49 @@ function StudentApp({ user, onLogout }) {
           <p>Your answers won’t be saved and the timer will stop. You’ll go back to Available Quizzes.</p>
         </ConfirmDialog>
       </>
+    )
+  }
+
+  if (resultId !== null && resultReady) {
+    return (
+      <QuizLayout
+        title={result.quiz.title}
+        wide
+        actions={
+          <button type="button" className="btn btn-secondary quiz-layout__exit" onClick={backToQuizzes}>
+            <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M19 12H5" />
+              <path d="m12 19-7-7 7-7" />
+            </svg>
+            <span className="quiz-layout__exit-label">Back to quizzes</span>
+          </button>
+        }
+      >
+        <QuizResults
+          result={result}
+          timedOut={timedOutId === result.attemptId}
+          onDone={backToQuizzes}
+        />
+      </QuizLayout>
+    )
+  }
+
+  if (resultId !== null) {
+    return (
+      <QuizLayout title="Quiz results">
+        {resultError ? (
+          <ResultStatus title="Couldn’t load your results" error={resultError}>
+            <button type="button" className="btn btn-primary" onClick={retryResult}>
+              Try again
+            </button>
+            <button type="button" className="btn btn-secondary" onClick={backToQuizzes}>
+              Back to quizzes
+            </button>
+          </ResultStatus>
+        ) : (
+          <ResultStatus busy title="Your results" message="Loading your results…" />
+        )}
+      </QuizLayout>
     )
   }
 

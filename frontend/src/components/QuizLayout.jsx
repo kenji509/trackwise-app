@@ -1,6 +1,9 @@
 import './QuizLayout.css'
 
-function QuizLayout({ title, actions, aside, children }) {
+function QuizLayout({ title, actions, aside, wide, children }) {
+  let bodyClass = aside ? 'quiz-layout__body' : 'quiz-layout__body quiz-layout__body--single'
+  if (wide) bodyClass += ' quiz-layout__body--wide'
+
   return (
     <div className="quiz-layout">
       <header className="quiz-layout__bar">
@@ -14,10 +17,7 @@ function QuizLayout({ title, actions, aside, children }) {
         {actions && <div className="quiz-layout__actions">{actions}</div>}
       </header>
 
-      <main
-        id="main"
-        className={aside ? 'quiz-layout__body' : 'quiz-layout__body quiz-layout__body--single'}
-      >
+      <main id="main" className={bodyClass}>
         <div className="quiz-layout__content">{children}</div>
         {aside && <div className="quiz-layout__aside">{aside}</div>}
       </main>

@@ -78,3 +78,11 @@ export function getSections() {
 export function getQuizQuestions(quizId) {
   return request(`/quiz/api/getQuizQuestions/${quizId}`)
 }
+
+export function submitAttempt(attempt) {
+  return request('/attempt/api/submitAttempt', { method: 'POST', body: JSON.stringify(attempt) })
+}
+
+export function getAttempt(attemptId) {
+  return request(`/attempt/api/getAttempt/${attemptId}`)
+}

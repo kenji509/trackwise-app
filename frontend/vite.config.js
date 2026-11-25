@@ -22,6 +22,7 @@ export default defineConfig({
       '/question/api': backend,
       '/topic/api': backend,
       '/section/api': backend,
+      '/attempt/api': backend,
     },
   },
 })
