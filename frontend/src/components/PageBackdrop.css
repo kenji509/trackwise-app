@@ -1,0 +1,191 @@
+.page-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.page-backdrop__blob {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--blob-color) 35%, transparent);
+  animation: page-backdrop-drift var(--drift-time, 36s) ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.page-backdrop__blob--blue {
+  --blob-color: var(--color-primary-soft);
+  --drift-x: -2.5vmax;
+  --drift-y: 2vmax;
+  top: -18vmax;
+  right: -16vmax;
+  width: 52vmax;
+  height: 52vmax;
+}
+
+.page-backdrop__blob--sunny {
+  --blob-color: var(--sunny-soft);
+  --drift-x: 2vmax;
+  --drift-y: -2.5vmax;
+  --drift-time: 42s;
+  bottom: -20vmax;
+  left: -14vmax;
+  width: 50vmax;
+  height: 50vmax;
+}
+
+.page-backdrop__blob--mint {
+  --blob-color: var(--mint-soft);
+  --drift-x: -2vmax;
+  --drift-y: -1.5vmax;
+  --drift-time: 48s;
+  bottom: -16vmax;
+  right: -12vmax;
+  width: 38vmax;
+  height: 38vmax;
+}
+
+@keyframes page-backdrop-drift {
+  to {
+    transform: translate(var(--drift-x), var(--drift-y)) scale(1.04);
+  }
+}
+
+.page-backdrop__dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgb(255 255 255 / 0.9) 1.4px, transparent 1.6px);
+  background-position: 10px 10px;
+  background-size: 22px 22px;
+}
+
+.page-backdrop__doodle {
+  position: absolute;
+  width: 52px;
+  height: 52px;
+  fill: none;
+  stroke: var(--accent-bright);
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.08;
+  transform: rotate(var(--tilt, 0deg));
+}
+
+.page-backdrop__doodle.accent-sunny {
+  opacity: 0.1;
+}
+
+.page-backdrop__doodle.accent-primary,
+.page-backdrop__doodle.accent-grape {
+  opacity: 0.07;
+}
+
+.page-backdrop__doodle.accent-coral {
+  opacity: 0.06;
+}
+
+.page-backdrop__doodle--pencil {
+  --tilt: -14deg;
+  top: 9%;
+  left: 4%;
+  width: 60px;
+  height: 60px;
+}
+
+.page-backdrop__doodle--bulb {
+  --tilt: 10deg;
+  top: 6%;
+  left: 47%;
+}
+
+.page-backdrop__doodle--star {
+  --tilt: 12deg;
+  top: 35%;
+  left: 21%;
+  width: 44px;
+  height: 44px;
+}
+
+.page-backdrop__doodle--squared {
+  --tilt: -8deg;
+  top: 33%;
+  left: 68%;
+}
+
+.page-backdrop__doodle--grade {
+  --tilt: -10deg;
+  top: 47%;
+  left: 7%;
+  width: 56px;
+  height: 56px;
+}
+
+.page-backdrop__doodle--book {
+  --tilt: 6deg;
+  top: 51%;
+  left: 89%;
+  width: 60px;
+  height: 60px;
+}
+
+.page-backdrop__doodle--check {
+  --tilt: -6deg;
+  top: 63%;
+  left: 38%;
+  width: 44px;
+  height: 44px;
+}
+
+.page-backdrop__doodle--plane {
+  --tilt: -12deg;
+  top: 69%;
+  left: 74%;
+}
+
+.page-backdrop__doodle--ruler {
+  --tilt: 8deg;
+  top: 82%;
+  left: 27%;
+  width: 60px;
+  height: 60px;
+}
+
+.page-backdrop__doodle--digits {
+  --tilt: -5deg;
+  top: 85%;
+  left: 55%;
+  width: 72px;
+  height: 48px;
+}
+
+.page-backdrop--calm .page-backdrop__blob {
+  animation: none;
+}
+
+@media (max-width: 1023px) {
+  .page-backdrop__doodle {
+    width: 44px;
+    height: 44px;
+  }
+
+  .page-backdrop__doodle--bulb,
+  .page-backdrop__doodle--squared,
+  .page-backdrop__doodle--check,
+  .page-backdrop__doodle--digits {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .page-backdrop__doodle {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-backdrop__blob {
+    animation: none;
+  }
+}

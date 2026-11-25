@@ -30,6 +30,7 @@ import QuestionNavigator from './components/QuestionNavigator.jsx'
 import ConfirmDialog from './components/ConfirmDialog.jsx'
 import QuizResults from './components/QuizResults.jsx'
 import ResultStatus from './components/ResultStatus.jsx'
+import PageBackdrop from './components/PageBackdrop.jsx'
 import * as api from './api.js'
 import { emptyForm, toForm, toRequestBody, validateQuiz } from './quizForm.js'
 import {
@@ -487,6 +488,8 @@ function App({ user, onLogout }) {
         Skip to main content
       </a>
 
+      <PageBackdrop />
+
       <div className="app" data-nav={navCollapsed ? 'collapsed' : 'expanded'}>
         <SideBar collapsed={navCollapsed} onToggle={toggleNav} user={user} onLogout={onLogout}>
           {navigation}
@@ -869,6 +872,7 @@ function StudentApp({ user, onLogout }) {
 
     return (
       <>
+        <PageBackdrop calm />
         <QuizLayout title={attempt.quiz.title}>
           {submitError ? (
             <ResultStatus title="Your quiz isn’t saved yet" note={timeUpNote} error={submitError}>
@@ -911,6 +915,7 @@ function StudentApp({ user, onLogout }) {
 
     return (
       <>
+        <PageBackdrop calm />
         <QuizLayout
           title={attempt.quiz.title}
           actions={
@@ -1003,44 +1008,50 @@ function StudentApp({ user, onLogout }) {
 
   if (resultId !== null && resultReady) {
     return (
-      <QuizLayout
-        title={result.quiz.title}
-        wide
-        actions={
-          <button type="button" className="btn btn-secondary quiz-layout__exit" onClick={backToQuizzes}>
-            <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M19 12H5" />
-              <path d="m12 19-7-7 7-7" />
-            </svg>
-            <span className="quiz-layout__exit-label">Back to quizzes</span>
-          </button>
-        }
-      >
-        <QuizResults
-          result={result}
-          timedOut={timedOutId === result.attemptId}
-          onDone={backToQuizzes}
-        />
-      </QuizLayout>
+      <>
+        <PageBackdrop />
+        <QuizLayout
+          title={result.quiz.title}
+          wide
+          actions={
+            <button type="button" className="btn btn-secondary quiz-layout__exit" onClick={backToQuizzes}>
+              <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M19 12H5" />
+                <path d="m12 19-7-7 7-7" />
+              </svg>
+              <span className="quiz-layout__exit-label">Back to quizzes</span>
+            </button>
+          }
+        >
+          <QuizResults
+            result={result}
+            timedOut={timedOutId === result.attemptId}
+            onDone={backToQuizzes}
+          />
+        </QuizLayout>
+      </>
     )
   }
 
   if (resultId !== null) {
     return (
-      <QuizLayout title="Quiz results">
-        {resultError ? (
-          <ResultStatus title="Couldn’t load your results" error={resultError}>
-            <button type="button" className="btn btn-primary" onClick={retryResult}>
-              Try again
-            </button>
-            <button type="button" className="btn btn-secondary" onClick={backToQuizzes}>
-              Back to quizzes
-            </button>
-          </ResultStatus>
-        ) : (
-          <ResultStatus busy title="Your results" message="Loading your results…" />
-        )}
-      </QuizLayout>
+      <>
+        <PageBackdrop />
+        <QuizLayout title="Quiz results">
+          {resultError ? (
+            <ResultStatus title="Couldn’t load your results" error={resultError}>
+              <button type="button" className="btn btn-primary" onClick={retryResult}>
+                Try again
+              </button>
+              <button type="button" className="btn btn-secondary" onClick={backToQuizzes}>
+                Back to quizzes
+              </button>
+            </ResultStatus>
+          ) : (
+            <ResultStatus busy title="Your results" message="Loading your results…" />
+          )}
+        </QuizLayout>
+      </>
     )
   }
 
@@ -1063,6 +1074,8 @@ function StudentApp({ user, onLogout }) {
       <a href="#main" className="skip-link">
         Skip to main content
       </a>
+
+      <PageBackdrop />
 
       <div className="app" data-nav={navCollapsed ? 'collapsed' : 'expanded'}>
         <SideBar collapsed={navCollapsed} onToggle={toggleNav} user={user} onLogout={onLogout}>
@@ -1289,109 +1302,54 @@ function Root() {
   if (submitting) submitLabel = isRegister ? 'Creating account…' : 'Logging in…'
 
   return (
-    <AuthLayout
-      title={isRegister ? 'Create your account' : 'Welcome back'}
-      subtitle={
-        isRegister ? 'Fields marked * are required.' : 'Log in to see your quizzes and progress.'
-      }
-      footer={
-        <>
-          {isRegister ? 'Already have an account?' : 'New to TrackWise?'}
-          <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={() => showScreen(isRegister ? 'login' : 'register')}
-            disabled={submitting}
-          >
-            {isRegister ? 'Log in' : 'Create an account'}
-          </button>
-        </>
-      }
-    >
-      {isRegister ? (
-        <AuthForm
-          error={authError}
-          submitLabel={submitLabel}
-          submitting={submitting}
-          onSubmit={register}
-        >
-          <FormField
-            label="Full name"
-            name="fullName"
-            value={registerForm.fullName}
-            onChange={updateRegister}
-            onBlur={touchField}
-            error={touched.fullName && registerErrors.fullName}
-            autoComplete="name"
-            maxLength={100}
-            required
-          />
-          <FormField
-            label="Email"
-            name="email"
-            type="email"
-            value={registerForm.email}
-            onChange={updateRegister}
-            onBlur={touchField}
-            error={touched.email && registerErrors.email}
-            autoComplete="email"
-            autoCapitalize="none"
-            spellCheck={false}
-            required
-          />
-          <FormField
-            label="Password"
-            name="password"
-            type="password"
-            value={registerForm.password}
-            onChange={updateRegister}
-            onBlur={touchField}
-            error={touched.password && registerErrors.password}
-            hint="At least 8 characters."
-            autoComplete="new-password"
-            maxLength={72}
-            required
-          />
-          <RoleChoice name="role" value={registerForm.role} onChange={updateRegister} />
-          <FormField
-            label="Section"
-            name="sectionId"
-            type="select"
-            options={sectionChoices}
-            value={registerForm.sectionId}
-            onChange={updateRegister}
-            onBlur={touchField}
-            error={touched.sectionId && registerErrors.sectionId}
-            hint={sectionHint}
-            disabled={sectionsLoading}
-            required={isStudent}
-          />
-          {sectionsError && (
-            <div className="alert auth-form__retry" role="alert">
-              <span>Couldn’t load sections. {sectionsError}</span>
-              <button type="button" className="btn btn-secondary" onClick={retrySections}>
-                Try again
-              </button>
-            </div>
-          )}
-        </AuthForm>
-      ) : (
-        <RoleTabs value={loginRole} onChange={changeLoginRole}>
+    <>
+      <PageBackdrop />
+      <AuthLayout
+        title={isRegister ? 'Create your account' : 'Welcome back'}
+        subtitle={
+          isRegister ? 'Fields marked * are required.' : 'Log in to see your quizzes and progress.'
+        }
+        footer={
+          <>
+            {isRegister ? 'Already have an account?' : 'New to TrackWise?'}
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => showScreen(isRegister ? 'login' : 'register')}
+              disabled={submitting}
+            >
+              {isRegister ? 'Log in' : 'Create an account'}
+            </button>
+          </>
+        }
+      >
+        {isRegister ? (
           <AuthForm
             error={authError}
             submitLabel={submitLabel}
             submitting={submitting}
-            onSubmit={login}
+            onSubmit={register}
           >
+            <FormField
+              label="Full name"
+              name="fullName"
+              value={registerForm.fullName}
+              onChange={updateRegister}
+              onBlur={touchField}
+              error={touched.fullName && registerErrors.fullName}
+              autoComplete="name"
+              maxLength={100}
+              required
+            />
             <FormField
               label="Email"
               name="email"
               type="email"
-              value={loginForm.email}
-              onChange={updateLogin}
+              value={registerForm.email}
+              onChange={updateRegister}
               onBlur={touchField}
-              error={touched.email && loginErrors.email}
-              autoComplete="username"
+              error={touched.email && registerErrors.email}
+              autoComplete="email"
               autoCapitalize="none"
               spellCheck={false}
               required
@@ -1400,17 +1358,75 @@ function Root() {
               label="Password"
               name="password"
               type="password"
-              value={loginForm.password}
-              onChange={updateLogin}
+              value={registerForm.password}
+              onChange={updateRegister}
               onBlur={touchField}
-              error={touched.password && loginErrors.password}
-              autoComplete="current-password"
+              error={touched.password && registerErrors.password}
+              hint="At least 8 characters."
+              autoComplete="new-password"
+              maxLength={72}
               required
             />
+            <RoleChoice name="role" value={registerForm.role} onChange={updateRegister} />
+            <FormField
+              label="Section"
+              name="sectionId"
+              type="select"
+              options={sectionChoices}
+              value={registerForm.sectionId}
+              onChange={updateRegister}
+              onBlur={touchField}
+              error={touched.sectionId && registerErrors.sectionId}
+              hint={sectionHint}
+              disabled={sectionsLoading}
+              required={isStudent}
+            />
+            {sectionsError && (
+              <div className="alert auth-form__retry" role="alert">
+                <span>Couldn’t load sections. {sectionsError}</span>
+                <button type="button" className="btn btn-secondary" onClick={retrySections}>
+                  Try again
+                </button>
+              </div>
+            )}
           </AuthForm>
-        </RoleTabs>
-      )}
-    </AuthLayout>
+        ) : (
+          <RoleTabs value={loginRole} onChange={changeLoginRole}>
+            <AuthForm
+              error={authError}
+              submitLabel={submitLabel}
+              submitting={submitting}
+              onSubmit={login}
+            >
+              <FormField
+                label="Email"
+                name="email"
+                type="email"
+                value={loginForm.email}
+                onChange={updateLogin}
+                onBlur={touchField}
+                error={touched.email && loginErrors.email}
+                autoComplete="username"
+                autoCapitalize="none"
+                spellCheck={false}
+                required
+              />
+              <FormField
+                label="Password"
+                name="password"
+                type="password"
+                value={loginForm.password}
+                onChange={updateLogin}
+                onBlur={touchField}
+                error={touched.password && loginErrors.password}
+                autoComplete="current-password"
+                required
+              />
+            </AuthForm>
+          </RoleTabs>
+        )}
+      </AuthLayout>
+    </>
   )
 }
 

@@ -1,0 +1,10 @@
+[    1273ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'attribution-reporting'. @ :1
+[    1573ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://claude.ai/api/account?parts=identity:1
+[    1574ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://claude.ai/api/frame/9145bcb9-80c8-409f-83f6-5ea2a707716a?via=user_open&bk=initial&actor=id&vt=1&rw=1:1
+[    2839ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'attribution-reporting'. @ :1
+[    3228ms] [LOG] recaptchacompat disabled @ https://js.hcaptcha.com/1/api.js?render=explicit&recaptchacompat=off&onload=__antClientAttestationHcaptchaInvisibleReady:4
+[    3328ms] [INFO] [O11Y] [DatadogRUM] Initialized {service: claude-ai, env: production, version: dfd96cd3b8} @ https://assets-proxy.anthropic.com/claude-ai/v2/assets/v1/chunk-C027DMz_.js:2
+[    3448ms] [ERROR] Not signed in with the identity provider. @ https://claude.ai/login?returnTo=%2Fartifact%2FJwTKCMR4y8RA8z4RZC7zrm%3Fask%3Dreturn:1
+[    4101ms] [ERROR] [GSI_LOGGER]: FedCM get() rejects with AbortError: signal is aborted without reason @ https://assets-proxy.anthropic.com/claude-ai/v2/assets/v1/chunk-C027DMz_.js:22
+[    4556ms] [ERROR] Cross-Origin-Opener-Policy policy would block the window.closed call. @ https://accounts.google.com/gsi/client:138
+[    4556ms] [ERROR] Cross-Origin-Opener-Policy policy would block the window.closed call. @ https://accounts.google.com/gsi/client:138

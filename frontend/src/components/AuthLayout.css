@@ -2,7 +2,6 @@
   display: grid;
   grid-template-columns: minmax(400px, 5fr) 7fr;
   min-height: 100dvh;
-  background: var(--color-bg);
 }
 
 .auth__panel {

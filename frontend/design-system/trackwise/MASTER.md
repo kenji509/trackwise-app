@@ -22,6 +22,9 @@
 11. **Demo nav items:** Dashboard, Questions and Topics are listed under Teaching as **demo-only placeholders** (`demo: true` in `navSections`, `main.jsx`). They look like inactive items, are marked `aria-disabled="true"`, and a click or Enter does nothing (no URL change, no scroll, the mobile drawer stays open). Quizzes stays the only active, working item. No routing.
 12. **Icon-only rail:** the collapsed sidebar and the tablet rail show nav icons only; the label stays in the link as its accessible name and appears as a `title` tooltip.
 
+**2026-11-26 (page backdrop)**
+13. **`PageBackdrop` is the one exception to "no drawings behind text".** A fixed, `aria-hidden`, `pointer-events: none` layer at `z-index: -1` on the Quizzes, Available Quizzes, login/register and Results screens: soft blobs in `--color-primary-soft`, `--sunny-soft` and `--mint-soft`, white graph-paper dots, and ten outline doodles in the bright accent shades at 6–10% opacity, drawn *under* the blobs so the two never stack. Quiz-taking uses `<PageBackdrop calm />` (blobs only, no motion). Doodles drop to six under 1024px and are hidden under 768px; the blob drift is off for reduced motion. **Limit:** no backdrop pixel may be darker than luminance 0.864 (keeps blue text on the page background at 4.5:1 or more; measured darkest 0.867). Re-check this when changing any backdrop color or opacity. `.auth` and `.quiz-layout` have no background of their own so the layer shows through.
+
 **Building blocks** (in `src/components/`): `TopicChips`, `StatusBadge`, `QuizMenu` (⋯ menu button), `SelectField` (label inside the pill), `ViewToggle`, `SampleSwitch`, `SampleNotice`, `QuizToolbar`, `QuizStats` (bento tiles), `QuizCard` (grid + list layouts). Reuse them on new pages.
 
 **Product:** TrackWise: quizzes and per-topic progress tracking for teachers and students. Web app, React 19 + Vite, **plain CSS** (no Tailwind, no UI libraries).
@@ -117,7 +120,7 @@ Color never carries meaning on its own: status badges have text plus an icon, an
 - **Pressable lip:** filled buttons (`.btn-primary`, `.btn-light`) sit on a 3px solid shadow in a darker shade (`--lip`). On press they move down 2px and the lip shrinks to 1px (`--lip-pressed`), so layout never moves. Secondary buttons get a 2px `--color-border` lip. The selected view-toggle button gets a 2px blue lip.
 - **Graph-paper dots:** grid card bands, the banner (right side only, masked away from text) and the form header use a faint `radial-gradient` dot grid (14–20px). The card date sits on a white pill so its text never touches the dots.
 - Spacing: 4/8 grid: 4 · 8 · 12 · 16 · 24 · 32 · 40 · 48
-- Decorative drawings are `aria-hidden` and **must never sit behind text.** The banner drawing is hidden under 1024px; check for overlap at every breakpoint.
+- Decorative drawings are `aria-hidden` and **must never sit behind text** (only exception: the faint `PageBackdrop` layer, decision 13). The banner drawing is hidden under 1024px; check for overlap at every breakpoint.
 
 ## 5. Motion (subtle; unchanged)
 | Token | Value | Use |
@@ -159,4 +162,4 @@ Color never carries meaning on its own: status badges have text plus an icon, an
 Contrast 4.5:1 for text, 3:1 for control edges and meaningful marks · visible 2px focus ring (blue; white on the banner) · 44px targets · `hover-vs-tap`: no hover-only actions · `color-not-only` · `chip-collection-reflow` · `submit-not-pre-disabled` · `unsaved-changes-guard` · `success-feedback` (toast, polite) · `persistent-errors` (inline, never toasts) · `dialog-focus` · `focus-not-obscured` · `reduced-motion` · `heading-hierarchy` · skip link · decorative drawings `aria-hidden`.
 
 ## 9. Anti-patterns (do not use)
-Yellow text or yellow meaningful marks on white · bright accent shades for anything that carries meaning · drawings or dot grids behind text · toy-like thick outlines, double or inner shadows · children's fonts (Baloo, Comic Neue) · actions only visible on hover · color-only status · clipped chip rows · "Soon" labels, or placeholder nav links that aren't marked `aria-disabled` and don't cancel their click (see decision 11) · emoji used as icons · more than one primary action per screen · dark mode.
+Yellow text or yellow meaningful marks on white · bright accent shades for anything that carries meaning · drawings or dot grids behind text (except the `PageBackdrop` layer within its luminance limit, decision 13) · toy-like thick outlines, double or inner shadows · children's fonts (Baloo, Comic Neue) · actions only visible on hover · color-only status · clipped chip rows · "Soon" labels, or placeholder nav links that aren't marked `aria-disabled` and don't cancel their click (see decision 11) · emoji used as icons · more than one primary action per screen · dark mode.
