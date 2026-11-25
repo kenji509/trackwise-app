@@ -110,3 +110,7 @@ export function submitAttempt(attempt) {
 export function getAttempt(attemptId) {
   return request(`/attempt/api/getAttempt/${attemptId}`)
 }
+
+export function getAttemptsByStudent(studentId) {
+  return request(`/attempt/api/getAttemptsByStudent/${studentId}`)
+}

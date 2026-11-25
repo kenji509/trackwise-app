@@ -16,7 +16,7 @@ function submittedText(value) {
   return Number.isNaN(date.getTime()) ? '' : `Submitted ${submittedFormat.format(date)}`
 }
 
-function QuizResults({ result, timedOut, onDone }) {
+function QuizResults({ result, timedOut, onDone, doneLabel = 'Back to quizzes' }) {
   const summary = resultSummary(result)
   const submitted = submittedText(result.submittedAt)
 
@@ -103,7 +103,7 @@ function QuizResults({ result, timedOut, onDone }) {
       </section>
 
       <button type="button" className="btn btn-primary quiz-results__done" onClick={onDone}>
-        Back to quizzes
+        {doneLabel}
       </button>
     </div>
   )

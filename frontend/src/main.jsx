@@ -34,6 +34,8 @@ import PageBackdrop from './components/PageBackdrop.jsx'
 import QuestionManager from './components/QuestionManager.jsx'
 import QuestionList from './components/QuestionList.jsx'
 import QuestionEditor from './components/QuestionEditor.jsx'
+import MyProgress from './components/MyProgress.jsx'
+import QuizHistory from './components/QuizHistory.jsx'
 import * as api from './api.js'
 import { emptyForm, toForm, toRequestBody, validateQuiz } from './quizForm.js'
 import {
@@ -82,6 +84,7 @@ import {
   topicOptions,
 } from './quizData.js'
 import { makeSampleData } from './sampleData.js'
+import { buildProgress, historyViews } from './progressData.js'
 
 // Navigation. Quizzes is the only built page; items marked demo are
 // placeholders for the demo: clicking them does nothing (see SideBtn).
@@ -152,8 +155,27 @@ function showResultUrl(attemptId) {
   window.history.pushState(null, '', `#results/${attemptId}`)
 }
 
-function clearResultUrl() {
-  window.history.pushState(null, '', window.location.pathname + window.location.search)
+const STUDENT_PAGES = ['progress', 'history']
+
+function readStudentPage() {
+  const page = window.location.hash.slice(1)
+  return STUDENT_PAGES.includes(page) ? page : 'quizzes'
+}
+
+// Student URL: '' or #quizzes, #progress, #history, #results/<id>. Any other
+// hash (like #main from the skip link) is not a route and returns null.
+function readStudentRoute() {
+  const resultId = readResultId()
+  if (resultId !== null) return { page: null, resultId }
+  const hash = window.location.hash
+  if (hash === '' || hash === '#' || hash === '#quizzes') return { page: 'quizzes', resultId: null }
+  if (STUDENT_PAGES.includes(hash.slice(1))) return { page: hash.slice(1), resultId: null }
+  return null
+}
+
+function showPageUrl(page) {
+  const url = page === 'quizzes' ? window.location.pathname + window.location.search : `#${page}`
+  window.history.pushState(null, '', url)
 }
 
 // "Now" for the greeting and "this week". Set when data arrives (not during
@@ -1035,9 +1057,16 @@ function App({ user, onLogout }) {
 const studentNavSections = [
   {
     label: 'Learning',
-    items: [{ id: 'quizzes', label: 'Available Quizzes' }],
+    items: [
+      { id: 'quizzes', label: 'Available Quizzes' },
+      { id: 'progress', label: 'My Progress' },
+      { id: 'history', label: 'Quiz History' },
+    ],
   },
 ]
+
+const STUDENT_PAGE_TITLES = { quizzes: 'Available Quizzes', progress: 'My Progress', history: 'Quiz History' }
+const RESULT_BACK_LABELS = { progress: 'Back to My Progress', history: 'Back to Quiz History' }
 
 // eslint-disable-next-line react-refresh/only-export-components
 function StudentApp({ user, onLogout }) {
@@ -1063,12 +1092,19 @@ function StudentApp({ user, onLogout }) {
   const [resultError, setResultError] = useState('')
   const [resultLoad, setResultLoad] = useState(0)
   const [timedOutId, setTimedOutId] = useState(null)
+  const [page, setPage] = useState(readStudentPage)
+  const [resultOrigin, setResultOrigin] = useState(null)
+  const [pastAttempts, setPastAttempts] = useState(null)
+  const [attemptsError, setAttemptsError] = useState('')
+  const [attemptsLoad, setAttemptsLoad] = useState(0)
 
   const taking = attempt !== null && finished === null
   const deadline = attempt ? attempt.deadline : 0
   const resultReady = result !== null && result.attemptId === resultId
+  const needsAttempts = attempt === null && resultId === null && page !== 'quizzes'
+  const attemptsLoading = pastAttempts === null && attemptsError === ''
 
-  let screenTitle = 'Available Quizzes'
+  let screenTitle = STUDENT_PAGE_TITLES[page]
   if (resultId !== null) screenTitle = resultReady ? `Results: ${result.quiz.title}` : 'Results'
   if (attempt) screenTitle = attempt.quiz.title
 
@@ -1100,13 +1136,43 @@ function StudentApp({ user, onLogout }) {
 
   useEffect(() => {
     function followUrl() {
-      setResultId(readResultId())
-      setResultError('')
+      const route = readStudentRoute()
+      if (!route) return
+      flushSync(() => {
+        setResultId(route.resultId)
+        setResultError('')
+        setResultOrigin(null)
+        if (route.page) setPage(route.page)
+      })
+      if (route.page) {
+        window.scrollTo(0, 0)
+        focusById('main')
+      }
     }
 
     window.addEventListener('hashchange', followUrl)
     return () => window.removeEventListener('hashchange', followUrl)
   }, [])
+
+  useEffect(() => {
+    if (!needsAttempts) return
+    let ignore = false
+
+    api
+      .getAttemptsByStudent(user.userId)
+      .then((list) => {
+        if (ignore) return
+        setPastAttempts(list)
+        setAttemptsError('')
+      })
+      .catch((error) => {
+        if (!ignore) setAttemptsError(error.message)
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [needsAttempts, attemptsLoad, user.userId])
 
   useEffect(() => {
     if (resultId === null || resultReady) return
@@ -1254,11 +1320,14 @@ function StudentApp({ user, onLogout }) {
     focusById('main')
   }
 
-  function backToQuizzes() {
-    clearResultUrl()
+  function leaveResults() {
+    const target = resultOrigin ?? 'quizzes'
+    showPageUrl(target)
     flushSync(() => {
       setResultId(null)
       setResultError('')
+      setResultOrigin(null)
+      setPage(target)
     })
     window.scrollTo(0, 0)
     focusById('main')
@@ -1268,6 +1337,28 @@ function StudentApp({ user, onLogout }) {
     setResultError('')
     setResultLoad(resultLoad + 1)
   }
+
+  // From My Progress or Quiz History: the attempt is already loaded, so the
+  // Results screen shows at once and its Back button returns to that page
+  function openResult(attemptId) {
+    const saved = pastAttempts?.find((item) => item.attemptId === attemptId) || null
+    showResultUrl(attemptId)
+    flushSync(() => {
+      setResultOrigin(page)
+      setResultError('')
+      setResultId(attemptId)
+      if (saved) setResult(saved)
+    })
+    window.scrollTo(0, 0)
+    focusById('quiz-result-title')
+  }
+
+  function retryAttempts() {
+    setAttemptsError('')
+    setAttemptsLoad(attemptsLoad + 1)
+  }
+
+  const resultBackLabel = RESULT_BACK_LABELS[resultOrigin] ?? 'Back to quizzes'
 
   if (attempt && finished) {
     const timedOut = finished === 'time'
@@ -1417,19 +1508,20 @@ function StudentApp({ user, onLogout }) {
           title={result.quiz.title}
           wide
           actions={
-            <button type="button" className="btn btn-secondary quiz-layout__exit" onClick={backToQuizzes}>
+            <button type="button" className="btn btn-secondary quiz-layout__exit" onClick={leaveResults}>
               <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M19 12H5" />
                 <path d="m12 19-7-7 7-7" />
               </svg>
-              <span className="quiz-layout__exit-label">Back to quizzes</span>
+              <span className="quiz-layout__exit-label">{resultBackLabel}</span>
             </button>
           }
         >
           <QuizResults
             result={result}
             timedOut={timedOutId === result.attemptId}
-            onDone={backToQuizzes}
+            onDone={leaveResults}
+            doneLabel={resultBackLabel}
           />
         </QuizLayout>
       </>
@@ -1446,8 +1538,8 @@ function StudentApp({ user, onLogout }) {
               <button type="button" className="btn btn-primary" onClick={retryResult}>
                 Try again
               </button>
-              <button type="button" className="btn btn-secondary" onClick={backToQuizzes}>
-                Back to quizzes
+              <button type="button" className="btn btn-secondary" onClick={leaveResults}>
+                {resultBackLabel}
               </button>
             </ResultStatus>
           ) : (
@@ -1458,19 +1550,125 @@ function StudentApp({ user, onLogout }) {
     )
   }
 
-  const available = availableQuizViews(buildQuizViews(quizzes, questions))
-
-  let heroSummary = `${plural(available.length, 'quiz', 'quizzes')} ready to take`
-  if (loading) heroSummary = 'Loading your quizzes…'
-  if (loadError) heroSummary = 'Your quizzes will appear here once the server is reachable.'
-
   const navigation = studentNavSections.map((section) => (
     <SideSection key={section.label} label={section.label}>
       {section.items.map((item) => (
-        <SideBtn key={item.id} icon={item.id} label={item.label} active={item.id === 'quizzes'} />
+        <SideBtn key={item.id} icon={item.id} label={item.label} active={item.id === page} />
       ))}
     </SideSection>
   ))
+
+  let heroSummary
+  let pageContent
+
+  if (page === 'progress') {
+    const progress = pastAttempts ? buildProgress(pastAttempts) : null
+    const strongest = progress?.strongest ?? null
+    const review = progress?.weakest && progress.weakest.level.id !== 'strong' ? progress.weakest : null
+    const tiles = [
+      {
+        id: 'taken',
+        icon: 'quizzes',
+        accent: 'primary',
+        label: 'Quizzes taken',
+        value: progress ? progress.quizzesTaken : '',
+        helper: progress ? `Across ${plural(progress.distinctQuizzes, 'quiz', 'quizzes')}` : '',
+      },
+      {
+        id: 'average',
+        icon: 'average',
+        accent: progress?.averageLevel?.accent ?? 'primary',
+        label: 'Average score',
+        value: progress?.averagePercent != null ? `${progress.averagePercent}%` : '—',
+        helper: progress?.averageLevel
+          ? `${progress.averageLevel.label} · mean of ${plural(progress.gradedCount, 'quiz', 'quizzes')}`
+          : '',
+      },
+      {
+        id: 'strongest',
+        icon: 'strong',
+        accent: strongest ? strongest.level.accent : 'mint',
+        label: 'Strongest topic',
+        value: strongest ? (
+          <span className={`topic-chip accent-${strongest.level.accent}`}>{strongest.name}</span>
+        ) : (
+          '—'
+        ),
+        helper: strongest ? `${strongest.percent}% correct · ${strongest.level.label}` : 'No topics yet',
+      },
+      {
+        id: 'review',
+        icon: 'review',
+        accent: review ? review.level.accent : 'mint',
+        label: 'Needs review',
+        value: review ? <span className={`topic-chip accent-${review.level.accent}`}>{review.name}</span> : 'Nothing',
+        helper: review ? `${review.percent}% correct · ${review.level.label}` : 'Every topic is Strong',
+      },
+    ]
+
+    heroSummary = 'Loading your progress…'
+    if (progress) {
+      heroSummary =
+        progress.quizzesTaken === 0
+          ? 'Take a quiz to start tracking your progress.'
+          : `${plural(progress.quizzesTaken, 'quiz', 'quizzes')} taken · ${progress.averagePercent ?? 0}% average score`
+    }
+    if (attemptsError) heroSummary = 'Your progress will appear here once the server is reachable.'
+
+    const showTiles = !attemptsError && (attemptsLoading || (progress !== null && progress.quizzesTaken > 0))
+    pageContent = (
+      <>
+        {showTiles && <QuizStats items={tiles} loading={attemptsLoading} />}
+        <MyProgress
+          loading={attemptsLoading}
+          loadError={attemptsError}
+          onRetry={retryAttempts}
+          progress={progress}
+          onView={openResult}
+        />
+      </>
+    )
+  } else if (page === 'history') {
+    const views = pastAttempts ? historyViews(pastAttempts) : null
+
+    heroSummary = 'Loading your quiz history…'
+    if (views) {
+      heroSummary =
+        views.length === 0 ? 'Quizzes you finish are listed here.' : `${plural(views.length, 'quiz', 'quizzes')} taken`
+    }
+    if (attemptsError) heroSummary = 'Your quiz history will appear here once the server is reachable.'
+
+    pageContent = (
+      <QuizHistory
+        loading={attemptsLoading}
+        loadError={attemptsError}
+        onRetry={retryAttempts}
+        attempts={views}
+        onView={openResult}
+      />
+    )
+  } else {
+    const available = availableQuizViews(buildQuizViews(quizzes, questions))
+
+    heroSummary = `${plural(available.length, 'quiz', 'quizzes')} ready to take`
+    if (loading) heroSummary = 'Loading your quizzes…'
+    if (loadError) heroSummary = 'Your quizzes will appear here once the server is reachable.'
+
+    pageContent = (
+      <AvailableQuizzes loading={loading} loadError={loadError} onRetry={retryLoad} count={available.length}>
+        {available.map((item, index) => (
+          <StudentQuizCard
+            key={item.quiz.quizId}
+            item={item}
+            index={index}
+            starting={startingId === item.quiz.quizId}
+            error={startError?.quizId === item.quiz.quizId ? startError.message : ''}
+            onStart={() => startQuiz(item.quiz)}
+          />
+        ))}
+      </AvailableQuizzes>
+    )
+  }
 
   return (
     <>
@@ -1492,26 +1690,10 @@ function StudentApp({ user, onLogout }) {
 
           <MainContent
             eyebrow={`${greeting(now)}, ${firstName(user.fullName)}`}
-            title="Available Quizzes"
+            title={STUDENT_PAGE_TITLES[page]}
             summary={heroSummary}
           >
-            <AvailableQuizzes
-              loading={loading}
-              loadError={loadError}
-              onRetry={retryLoad}
-              count={available.length}
-            >
-              {available.map((item, index) => (
-                <StudentQuizCard
-                  key={item.quiz.quizId}
-                  item={item}
-                  index={index}
-                  starting={startingId === item.quiz.quizId}
-                  error={startError?.quizId === item.quiz.quizId ? startError.message : ''}
-                  onStart={() => startQuiz(item.quiz)}
-                />
-              ))}
-            </AvailableQuizzes>
+            {pageContent}
           </MainContent>
         </div>
       </div>
@@ -1537,10 +1719,13 @@ function Root() {
 
   let pageTitle = screen === 'register' ? 'Create account' : 'Log in'
   if (user) pageTitle = user.role === 'TEACHER' ? 'Quizzes' : 'Available Quizzes'
+  // StudentApp names its own pages (My Progress, Quiz History, Results)
+  const studentNamesPage = user?.role === 'STUDENT'
 
   useEffect(() => {
+    if (studentNamesPage) return
     document.title = `${pageTitle} · TrackWise`
-  }, [pageTitle])
+  }, [pageTitle, studentNamesPage])
 
   useEffect(() => {
     if (screen !== 'register') return

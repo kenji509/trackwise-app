@@ -26,3 +26,6 @@ dist-ssr
 # Test screenshots and local Claude settings
 .playwright-mcp/
 .claude/    
+
+
+.playwright-mcp/

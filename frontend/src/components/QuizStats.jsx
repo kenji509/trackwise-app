@@ -26,6 +26,26 @@ const icons = {
       <path d="m2 17 10 5 10-5M2 12l10 5 10-5" />
     </>
   ),
+  average: (
+    <>
+      <path d="M4 18a8 8 0 1 1 16 0" />
+      <path d="m12 18 4-5" />
+      <path d="M12 18h.01" />
+    </>
+  ),
+  strong: (
+    <>
+      <path d="M8 21h8M12 17v4" />
+      <path d="M7 4h10v5a5 5 0 0 1-10 0V4Z" />
+      <path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3" />
+    </>
+  ),
+  review: (
+    <>
+      <path d="M2.5 5h6a3.5 3.5 0 0 1 3.5 3.5V20a2.5 2.5 0 0 0-2.5-2.5h-7z" />
+      <path d="M21.5 5h-6A3.5 3.5 0 0 0 12 8.5V20a2.5 2.5 0 0 1 2.5-2.5h7z" />
+    </>
+  ),
 }
 
 // Bento row of summary tiles: icon, label, big value, helper line.

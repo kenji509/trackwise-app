@@ -30,6 +30,19 @@ const icons = {
       <path d="m2 17 10 5 10-5M2 12l10 5 10-5" />
     </>
   ),
+  progress: (
+    <>
+      <path d="M3 3v18h18" />
+      <path d="m7 15 4-4 3 3 6-7" />
+    </>
+  ),
+  history: (
+    <>
+      <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+      <path d="M3 3v5h5" />
+      <path d="M12 7v5l3 2" />
+    </>
+  ),
 }
 
 // Demo items: the click is cancelled, so the URL and page stay as they are,
