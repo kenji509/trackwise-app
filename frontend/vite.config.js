@@ -20,6 +20,7 @@ export default defineConfig({
       '/quiz/api': backend,
       '/user/api': backend,
       '/question/api': backend,
+      '/choice/api': backend,
       '/topic/api': backend,
       '/section/api': backend,
       '/attempt/api': backend,

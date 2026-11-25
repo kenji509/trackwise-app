@@ -11,7 +11,7 @@ const MAX_STAGGER = 8
 
 // One quiz, as a card (layout="grid") or a row (layout="list"). Same markup for
 // both; QuizCard.css rearranges it. item comes from buildQuizViews() in quizData.js.
-function QuizCard({ item, layout, index = 0, deleting, deleteError, onEdit, onDelete }) {
+function QuizCard({ item, layout, index = 0, deleting, deleteError, onEdit, onManage, onDelete }) {
   const { quiz, questionCount, topics, accent, status, createdAt } = item
   const [confirming, setConfirming] = useState(false)
   const menuButtonRef = useRef(null)
@@ -53,6 +53,7 @@ function QuizCard({ item, layout, index = 0, deleting, deleteError, onEdit, onDe
           label={`Actions for ${quiz.title}`}
           buttonRef={menuButtonRef}
           onEdit={onEdit}
+          onManage={onManage}
           onDelete={() => setConfirming(true)}
           disabled={deleting}
         />

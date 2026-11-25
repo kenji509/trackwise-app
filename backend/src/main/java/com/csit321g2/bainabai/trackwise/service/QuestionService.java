@@ -1,14 +1,19 @@
 package com.csit321g2.bainabai.trackwise.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.csit321g2.bainabai.trackwise.entity.ChoiceEntity;
 import com.csit321g2.bainabai.trackwise.entity.QuestionEntity;
 import com.csit321g2.bainabai.trackwise.entity.QuizEntity;
 import com.csit321g2.bainabai.trackwise.entity.TopicEntity;
+import com.csit321g2.bainabai.trackwise.repository.ChoiceRepository;
 import com.csit321g2.bainabai.trackwise.repository.QuestionRepository;
 import com.csit321g2.bainabai.trackwise.repository.QuizRepository;
 import com.csit321g2.bainabai.trackwise.repository.TopicRepository;
@@ -24,6 +29,9 @@ public class QuestionService {
 
     @Autowired
     TopicRepository topicRepo;
+
+    @Autowired
+    ChoiceRepository choiceRepo;
 
     public QuestionService() {
     }
@@ -50,6 +58,20 @@ public class QuestionService {
 
     public QuestionEntity getQuestion(int id) {
         return repo.findById(id).orElseThrow(() -> new NoSuchElementException("Question " + id + " does not exist!"));
+    }
+
+    public List<QuestionEntity> getQuestionsByQuiz(int quizId) {
+        if (!quizRepo.existsById(quizId)) {
+            throw new NoSuchElementException("Quiz " + quizId + " does not exist!");
+        }
+        List<QuestionEntity> questions = repo.findByQuizQuizIdOrderByQuestionIdAsc(quizId);
+        Map<Integer, List<ChoiceEntity>> choicesByQuestion = choiceRepo.findByQuestionQuizQuizIdOrderByChoiceIdAsc(quizId)
+                .stream()
+                .collect(Collectors.groupingBy(choice -> choice.getQuestion().getQuestionId()));
+        for (QuestionEntity question : questions) {
+            question.setChoicesWithAnswers(choicesByQuestion.getOrDefault(question.getQuestionId(), new ArrayList<>()));
+        }
+        return questions;
     }
 
     public QuestionEntity putQuestion(int id, QuestionEntity newDetails) {

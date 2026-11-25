@@ -1,0 +1,111 @@
+.question-manager {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-5);
+}
+
+.question-manager__side,
+.question-manager__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.question-manager__details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.question-manager__heading {
+  font-size: var(--text-lg);
+}
+
+.question-manager__description {
+  overflow-wrap: anywhere;
+  font-size: var(--text-sm);
+}
+
+.question-manager__description.is-empty {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.question-manager__facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+}
+
+.question-manager__facts dt {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.question-manager__facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.question-manager__placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.question-manager__placeholder-title {
+  font-size: var(--text-xl);
+}
+
+.question-manager__placeholder-text {
+  max-width: 44ch;
+  color: var(--color-text-muted);
+}
+
+.question-manager__placeholder .btn {
+  margin-top: var(--space-2);
+  margin-bottom: var(--lip);
+}
+
+@media (max-width: 1023px) {
+  .question-manager {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .question-manager {
+    gap: var(--space-4);
+  }
+
+  .question-manager__details {
+    padding: var(--space-4);
+  }
+
+  .question-manager__placeholder {
+    padding: var(--space-7) var(--space-4);
+    border-radius: var(--radius-md);
+  }
+}

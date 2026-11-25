@@ -53,6 +53,11 @@ public class QuestionController {
         return service.getQuestion(id);
     }
 
+    @GetMapping("/getQuestionsByQuiz/{quizId}")
+    public List<QuestionEntity> getQuestionsByQuiz(@PathVariable int quizId) {
+        return service.getQuestionsByQuiz(quizId);
+    }
+
     @PutMapping("/putQuestion")
     public QuestionEntity putQuestion(@RequestParam int id, @RequestBody QuestionEntity newDetails) {
         return service.putQuestion(id, newDetails);

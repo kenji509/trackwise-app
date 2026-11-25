@@ -79,6 +79,30 @@ export function getQuizQuestions(quizId) {
   return request(`/quiz/api/getQuizQuestions/${quizId}`)
 }
 
+export function getQuestionsByQuiz(quizId) {
+  return request(`/question/api/getQuestionsByQuiz/${quizId}`)
+}
+
+export function createQuestion(question) {
+  return request('/question/api/postNewQuestion', { method: 'POST', body: JSON.stringify(question) })
+}
+
+export function updateQuestion(id, question) {
+  return request(`/question/api/putQuestion?id=${id}`, { method: 'PUT', body: JSON.stringify(question) })
+}
+
+export function deleteQuestion(id) {
+  return request(`/question/api/deleteQuestion/${id}`, { method: 'DELETE' })
+}
+
+export function createChoice(choice) {
+  return request('/choice/api/postNewChoice', { method: 'POST', body: JSON.stringify(choice) })
+}
+
+export function updateChoice(id, choice) {
+  return request(`/choice/api/putChoice?id=${id}`, { method: 'PUT', body: JSON.stringify(choice) })
+}
+
 export function submitAttempt(attempt) {
   return request('/attempt/api/submitAttempt', { method: 'POST', body: JSON.stringify(attempt) })
 }

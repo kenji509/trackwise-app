@@ -2,12 +2,13 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import './QuizMenu.css'
 
-// "⋯" button that opens Edit / Delete. Always visible (not hover-only), so it
+// "⋯" button that opens Edit / Manage questions / Delete. Manage questions only
+// shows when onManage is given (not for sample quizzes). Always visible (not hover-only), so it
 // works with touch, mouse and keyboard (UI UX Pro Max: hover-vs-tap).
 // Keyboard (WAI-ARIA menu button): Enter/Space/↓ open on the first item, ↑ on the
 // last; ↑/↓/Home/End move; Esc closes and returns focus; Tab closes.
 // buttonRef lets the card put focus back on this button (e.g. after "Cancel" delete).
-function QuizMenu({ label, buttonRef, onEdit, onDelete, disabled }) {
+function QuizMenu({ label, buttonRef, onEdit, onManage, onDelete, disabled }) {
   const [open, setOpen] = useState(false)
   const menuRef = useRef(null)
   const buttonId = useId()
@@ -124,6 +125,15 @@ function QuizMenu({ label, buttonRef, onEdit, onDelete, disabled }) {
             </svg>
             Edit
           </button>
+          {onManage && (
+            <button type="button" role="menuitem" tabIndex={-1} className="quiz-menu__item" onClick={() => choose(onManage)}>
+              <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M10 6h11M10 12h11M10 18h11" />
+                <path d="m3 6 1.5 1.5L7 5M3 12l1.5 1.5L7 11M3 18l1.5 1.5L7 17" />
+              </svg>
+              Manage questions
+            </button>
+          )}
           <div className="quiz-menu__separator" role="separator" />
           <button
             type="button"

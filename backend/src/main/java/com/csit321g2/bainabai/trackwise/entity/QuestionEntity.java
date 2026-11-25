@@ -35,6 +35,12 @@ public class QuestionEntity {
     @JsonIgnoreProperties({ "isCorrect", "question" })
     private List<ChoiceEntity> choices;
 
+    @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnoreProperties({ "question" })
+    private List<ChoiceEntity> choicesWithAnswers;
+
     public QuestionEntity() {
     }
 
@@ -78,5 +84,13 @@ public class QuestionEntity {
 
     public void setChoices(List<ChoiceEntity> choices) {
         this.choices = choices;
+    }
+
+    public List<ChoiceEntity> getChoicesWithAnswers() {
+        return choicesWithAnswers;
+    }
+
+    public void setChoicesWithAnswers(List<ChoiceEntity> choicesWithAnswers) {
+        this.choicesWithAnswers = choicesWithAnswers;
     }
 }

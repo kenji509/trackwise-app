@@ -31,8 +31,25 @@ import ConfirmDialog from './components/ConfirmDialog.jsx'
 import QuizResults from './components/QuizResults.jsx'
 import ResultStatus from './components/ResultStatus.jsx'
 import PageBackdrop from './components/PageBackdrop.jsx'
+import QuestionManager from './components/QuestionManager.jsx'
+import QuestionList from './components/QuestionList.jsx'
+import QuestionEditor from './components/QuestionEditor.jsx'
 import * as api from './api.js'
 import { emptyForm, toForm, toRequestBody, validateQuiz } from './quizForm.js'
+import {
+  choiceChanged,
+  choiceSaveOrder,
+  firstErrorId,
+  isDirty,
+  newDraft,
+  questionChanged,
+  savedAfterCreate,
+  toChoiceBody,
+  toDraft,
+  toQuestionBody,
+  topicSelectOptions,
+  validateDraft,
+} from './questionForm.js'
 import {
   emptyLogin,
   emptyRegister,
@@ -61,6 +78,7 @@ import {
   plural,
   quizStats,
   teacherOptions,
+  topicAccent,
   topicOptions,
 } from './quizData.js'
 import { makeSampleData } from './sampleData.js'
@@ -183,6 +201,67 @@ function App({ user, onLogout }) {
 
   // Success message: { id, title, description } or null
   const [toast, setToast] = useState(null)
+
+  // Manage questions: the quiz being edited (null = closed) and one draft per question
+  const [managedQuiz, setManagedQuiz] = useState(null)
+  const [drafts, setDrafts] = useState([])
+  const [draftTopics, setDraftTopics] = useState([])
+  const [draftIndex, setDraftIndex] = useState(0)
+  const [draftsLoading, setDraftsLoading] = useState(false)
+  const [draftsError, setDraftsError] = useState('')
+  const [draftsLoad, setDraftsLoad] = useState(0)
+  // Drafts that failed a save attempt; only these show their errors
+  const [checkedDrafts, setCheckedDrafts] = useState({})
+  const [savingDrafts, setSavingDrafts] = useState(false)
+  const [draftSaveError, setDraftSaveError] = useState('')
+  // 'delete' | 'leave' | null
+  const [draftConfirm, setDraftConfirm] = useState(null)
+
+  const managedQuizId = managedQuiz ? managedQuiz.quizId : null
+  const unsavedDrafts = drafts.filter(isDirty)
+  const guardDrafts = managedQuiz !== null && unsavedDrafts.length > 0
+
+  useEffect(() => {
+    if (managedQuizId === null) return
+    let ignore = false
+
+    Promise.all([api.getQuestionsByQuiz(managedQuizId), api.getTopics()])
+      .then(([questionList, topicList]) => {
+        if (ignore) return
+        setDrafts(questionList.map(toDraft))
+        setDraftTopics(topicList)
+      })
+      .catch((error) => {
+        if (!ignore) setDraftsError(error.message)
+      })
+      .finally(() => {
+        if (!ignore) setDraftsLoading(false)
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [managedQuizId, draftsLoad])
+
+  useEffect(() => {
+    if (!managedQuiz) return
+    document.title = `Questions: ${managedQuiz.title} · TrackWise`
+    return () => {
+      document.title = 'Quizzes · TrackWise'
+    }
+  }, [managedQuiz])
+
+  useEffect(() => {
+    if (!guardDrafts) return
+
+    function warnBeforeLeaving(event) {
+      event.preventDefault()
+      event.returnValue = ''
+    }
+
+    window.addEventListener('beforeunload', warnBeforeLeaving)
+    return () => window.removeEventListener('beforeunload', warnBeforeLeaving)
+  }, [guardDrafts])
 
   // Load everything from the backend when the page opens, on "Try again",
   // and when sample quizzes are switched off
@@ -482,6 +561,329 @@ function App({ user, onLogout }) {
     }
   }
 
+  // ===== Manage questions =====
+  function openManager(quiz) {
+    flushSync(() => {
+      setManagedQuiz(quiz)
+      setDrafts([])
+      setDraftIndex(0)
+      setDraftsLoading(true)
+      setDraftsError('')
+      setCheckedDrafts({})
+      setDraftSaveError('')
+      setDraftConfirm(null)
+    })
+    window.scrollTo(0, 0)
+    focusById('quiz-title')
+  }
+
+  // Question counts and topic chips on the quiz cards come from `questions`
+  function closeManager() {
+    flushSync(() => {
+      setDraftConfirm(null)
+      setManagedQuiz(null)
+      setDrafts([])
+    })
+    window.scrollTo(0, 0)
+    focusById('main')
+    api
+      .getQuestions()
+      .then(setQuestions)
+      .catch(() => {})
+  }
+
+  function leaveManager() {
+    if (unsavedDrafts.length > 0) setDraftConfirm('leave')
+    else closeManager()
+  }
+
+  function retryDrafts() {
+    setDraftsLoading(true)
+    setDraftsError('')
+    setDraftsLoad(draftsLoad + 1)
+  }
+
+  function showDraft(index, moveFocus) {
+    flushSync(() => setDraftIndex(index))
+    if (moveFocus) focusById('question-editor-title')
+  }
+
+  function addDraft() {
+    const draft = newDraft()
+    flushSync(() => {
+      setDrafts([...drafts, draft])
+      setDraftIndex(drafts.length)
+    })
+    focusById('field-topicId')
+  }
+
+  function patchDraft(key, change) {
+    setDrafts((current) => current.map((draft) => (draft.key === key ? change(draft) : draft)))
+  }
+
+  function changeDraftField(event) {
+    const { name, value } = event.target
+    patchDraft(drafts[draftIndex].key, (draft) => ({ ...draft, [name]: value }))
+  }
+
+  function changeChoiceText(index, value) {
+    patchDraft(drafts[draftIndex].key, (draft) => ({
+      ...draft,
+      choices: draft.choices.map((choice, i) => (i === index ? { ...choice, choiceText: value } : choice)),
+    }))
+  }
+
+  function changeCorrect(index) {
+    patchDraft(drafts[draftIndex].key, (draft) => ({ ...draft, correct: index }))
+  }
+
+  async function deleteDraft() {
+    const draft = drafts[draftIndex]
+    const number = draftIndex + 1
+    const remaining = drafts.length - 1
+    flushSync(() => setDraftConfirm(null))
+    try {
+      if (draft.questionId !== null) await api.deleteQuestion(draft.questionId)
+      flushSync(() => {
+        setDrafts((current) => current.filter((item) => item.key !== draft.key))
+        setDraftIndex((index) => Math.max(0, Math.min(index, remaining - 1)))
+        setDraftSaveError('')
+      })
+      showToast(draft.questionId !== null ? 'Question deleted' : 'Question removed', `Question ${number}, ${managedQuiz.title}`)
+      focusById(remaining > 0 ? 'question-editor-title' : 'question-list-add')
+    } catch (error) {
+      setDraftSaveError(`Couldn’t delete question ${number}. ${error.message}`)
+    }
+  }
+
+  // Saves one question, then its choices. New choices are created in A–D order
+  // because the server lists choices by id. When an existing choice becomes the
+  // correct one it is sent first, so the question never has zero correct choices.
+  // Each finished request is recorded right away, so a retry after a failure
+  // only sends what is still missing.
+  async function persistDraft(draft) {
+    const quizId = managedQuiz.quizId
+    let questionId = draft.questionId
+    let saved = draft.saved
+    const choiceIds = draft.choices.map((choice) => choice.choiceId)
+
+    if (questionId === null) {
+      const created = await api.createQuestion(toQuestionBody(draft, quizId))
+      questionId = created.questionId
+      saved = savedAfterCreate(draft)
+      const createdId = questionId
+      const snapshot = saved
+      patchDraft(draft.key, (current) => ({ ...current, questionId: createdId, saved: snapshot }))
+    } else if (questionChanged(draft)) {
+      await api.updateQuestion(questionId, toQuestionBody(draft, quizId))
+      saved = { ...saved, topicId: draft.topicId, questionText: draft.questionText.trim() }
+      const snapshot = saved
+      patchDraft(draft.key, (current) => ({ ...current, saved: snapshot }))
+    }
+
+    for (const index of choiceSaveOrder(draft)) {
+      const body = toChoiceBody(draft, index, questionId)
+      if (!choiceChanged(choiceIds[index], body.choiceText, body.isCorrect, saved.choices[index])) continue
+
+      const result =
+        choiceIds[index] === null ? await api.createChoice(body) : await api.updateChoice(choiceIds[index], body)
+      choiceIds[index] = result.choiceId
+      saved = {
+        ...saved,
+        choices: saved.choices.map((choice, i) =>
+          i === index ? { choiceId: result.choiceId, choiceText: body.choiceText, isCorrect: body.isCorrect } : choice,
+        ),
+      }
+      const snapshot = saved
+      patchDraft(draft.key, (current) => ({
+        ...current,
+        saved: snapshot,
+        choices: current.choices.map((choice, i) => (i === index ? { ...choice, choiceId: result.choiceId } : choice)),
+      }))
+    }
+  }
+
+  async function saveDrafts() {
+    if (savingDrafts || draftsLoading || draftsError) return
+    if (unsavedDrafts.length === 0) {
+      setDraftSaveError('')
+      showToast('Nothing to save', 'Every question is already saved.')
+      return
+    }
+
+    // Show errors on every unsaved question that has them, then go to the first one
+    const invalid = unsavedDrafts.filter((draft) => Object.keys(validateDraft(draft)).length > 0)
+    if (invalid.length > 0) {
+      const target = invalid[0]
+      flushSync(() => {
+        setCheckedDrafts((current) => ({ ...current, ...Object.fromEntries(invalid.map((draft) => [draft.key, true])) }))
+        setDraftIndex(drafts.findIndex((draft) => draft.key === target.key))
+        setDraftSaveError('')
+      })
+      focusById(firstErrorId(target, validateDraft(target)))
+      return
+    }
+
+    setSavingDrafts(true)
+    setDraftSaveError('')
+    let failing = null
+    try {
+      for (const draft of unsavedDrafts) {
+        failing = draft
+        await persistDraft(draft)
+      }
+      setCheckedDrafts({})
+      showToast('Quiz saved', `${plural(unsavedDrafts.length, 'question')} saved in ${managedQuiz.title}.`)
+    } catch (error) {
+      const number = drafts.findIndex((draft) => draft.key === failing.key) + 1
+      setDraftSaveError(
+        `Couldn’t save question ${number}. ${error.message} Your changes are still here, so you can try Save quiz again.`,
+      )
+    } finally {
+      setSavingDrafts(false)
+    }
+  }
+
+  if (managedQuiz) {
+    const currentDraft = drafts[draftIndex] || null
+    const currentIsSaved = currentDraft !== null && currentDraft.questionId !== null
+    const draftErrors = currentDraft && checkedDrafts[currentDraft.key] ? validateDraft(currentDraft) : {}
+    const questionItems = drafts.map((draft) => {
+      const topic = draftTopics.find((item) => String(item.topicId) === draft.topicId)
+      return {
+        key: draft.key,
+        text: draft.questionText.trim(),
+        topic: topic ? { topicId: topic.topicId, name: topic.name, accent: topicAccent(topic.topicId) } : null,
+        unsaved: isDirty(draft),
+        invalid: Boolean(checkedDrafts[draft.key]) && Object.keys(validateDraft(draft)).length > 0,
+      }
+    })
+
+    let managerState = 'ready'
+    if (draftsLoading) managerState = 'loading'
+    else if (draftsError) managerState = 'error'
+    else if (drafts.length === 0) managerState = 'empty'
+
+    let saveStatus = 'All changes saved'
+    if (unsavedDrafts.length > 0) saveStatus = `${plural(unsavedDrafts.length, 'question')} with unsaved changes`
+    if (savingDrafts) saveStatus = 'Saving…'
+    if (managerState === 'loading' || managerState === 'error') saveStatus = ''
+
+    return (
+      <>
+        <PageBackdrop calm />
+        <QuizLayout
+          title={managedQuiz.title}
+          wide
+          actions={
+            <>
+              <button type="button" className="btn btn-secondary quiz-layout__exit" onClick={leaveManager}>
+                <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M19 12H5" />
+                  <path d="m12 19-7-7 7-7" />
+                </svg>
+                <span className="quiz-layout__exit-label">Back to quizzes</span>
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={saveDrafts}
+                disabled={managerState === 'loading' || managerState === 'error'}
+              >
+                <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M5 4h11l3 3v13H5z" />
+                  <path d="M8 4v5h7V4M8 20v-6h8v6" />
+                </svg>
+                {savingDrafts ? 'Saving…' : 'Save quiz'}
+              </button>
+            </>
+          }
+        >
+          <QuestionManager
+            quiz={managedQuiz}
+            questionCount={drafts.length}
+            state={managerState}
+            loadError={draftsError}
+            saveError={draftSaveError}
+            onRetry={retryDrafts}
+            onAdd={addDraft}
+            list={
+              <QuestionList
+                items={questionItems}
+                current={draftIndex}
+                loading={managerState === 'loading'}
+                emptyText={managerState === 'error' ? 'Questions couldn’t be loaded.' : undefined}
+                status={saveStatus}
+                busy={savingDrafts || managerState === 'error'}
+                onSelect={(index) => showDraft(index, true)}
+                onAdd={addDraft}
+              />
+            }
+          >
+            {currentDraft && (
+              <QuestionEditor
+                number={draftIndex + 1}
+                total={drafts.length}
+                draft={currentDraft}
+                topicOptions={topicSelectOptions(draftTopics)}
+                errors={draftErrors}
+                busy={savingDrafts}
+                onField={changeDraftField}
+                onChoiceText={changeChoiceText}
+                onCorrect={changeCorrect}
+                onDelete={() => setDraftConfirm('delete')}
+                onPrevious={() => showDraft(draftIndex - 1, false)}
+                onNext={() => showDraft(draftIndex + 1, false)}
+              />
+            )}
+          </QuestionManager>
+        </QuizLayout>
+
+        <ConfirmDialog
+          open={draftConfirm === 'delete' && currentDraft !== null}
+          title={currentIsSaved ? `Delete question ${draftIndex + 1}?` : `Remove question ${draftIndex + 1}?`}
+          cancelLabel="Keep question"
+          confirmLabel={currentIsSaved ? 'Delete question' : 'Remove question'}
+          danger
+          onConfirm={deleteDraft}
+          onCancel={() => setDraftConfirm(null)}
+        >
+          {currentIsSaved ? (
+            <>
+              <p className="confirm-dialog__warning">
+                <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+                  <path d="M12 9v4M12 17h.01" />
+                </svg>
+                <span>Students’ saved answers to this question will also be deleted.</span>
+              </p>
+              <p>This can’t be undone.</p>
+            </>
+          ) : (
+            <p>This question hasn’t been saved yet, so removing it doesn’t change anything else.</p>
+          )}
+        </ConfirmDialog>
+
+        <ConfirmDialog
+          open={draftConfirm === 'leave'}
+          title="Leave without saving?"
+          cancelLabel="Keep editing"
+          confirmLabel="Leave without saving"
+          danger
+          onConfirm={closeManager}
+          onCancel={() => setDraftConfirm(null)}
+        >
+          <p>
+            {plural(unsavedDrafts.length, 'question')} {unsavedDrafts.length === 1 ? 'has' : 'have'} unsaved
+            changes. If you leave now, those changes are lost.
+          </p>
+        </ConfirmDialog>
+
+        <Toast toast={toast} onDismiss={() => setToast(null)} />
+      </>
+    )
+  }
+
   return (
     <>
       <a href="#main" className="skip-link">
@@ -552,6 +954,7 @@ function App({ user, onLogout }) {
                   deleting={deletingId === item.quiz.quizId}
                   deleteError={deleteError?.quizId === item.quiz.quizId ? deleteError.message : ''}
                   onEdit={() => openForm(item.quiz)}
+                  onManage={sampleMode ? undefined : () => openManager(item.quiz)}
                   onDelete={() => removeQuiz(item.quiz)}
                 />
               ))}
