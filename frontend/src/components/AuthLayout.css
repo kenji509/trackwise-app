@@ -74,11 +74,6 @@
   text-decoration-skip-ink: none;
 }
 
-.auth__lead {
-  max-width: 36ch;
-  color: #eff6ff;
-  font-size: var(--text-lg);
-}
 
 .auth__art {
   flex-shrink: 0;
@@ -205,9 +200,6 @@
     font-size: 1.5rem;
   }
 
-  .auth__lead {
-    display: none;
-  }
 
   .auth__main {
     padding: var(--space-4) var(--space-4) calc(var(--space-8) + env(safe-area-inset-bottom));

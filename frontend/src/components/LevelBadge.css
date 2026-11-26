@@ -18,3 +18,8 @@
   height: 14px;
   stroke-width: 2.8;
 }
+
+/* The half-filled circle needs a thinner line to stay round at 14px */
+.level-badge--practice .icon {
+  stroke-width: 2.2;
+}

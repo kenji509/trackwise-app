@@ -67,21 +67,12 @@
 
 /* ===== Expanded sidebar only (wider than 160px) ===== */
 @container sidebar (min-width: 161px) {
-  /* Section label ("TEACHING") with a yellow highlighter swipe underneath.
-     Ink text: 11.10:1 on the yellow, 14.63:1 on white. The rail hides this
-     label visually (SideSection.css), so the swipe is never drawn there. */
+  /* Section label ("TEACHING"): small muted caps, no highlighter (that is
+     kept for page titles). The rail hides it visually (SideSection.css). */
   .sidebar__nav .side-section__label {
-    width: fit-content;
     margin: 0 0 var(--space-2) var(--space-2);
     padding: 0 var(--space-1);
-    color: var(--color-text);
     line-height: 1.6;
-    background: linear-gradient(
-      transparent 52%,
-      var(--color-sunny-hover) 52%,
-      var(--color-sunny-hover) 94%,
-      transparent 94%
-    );
   }
 }
 

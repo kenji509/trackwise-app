@@ -1,133 +1,131 @@
+/* One light strip: cells split by hairlines, no shadows. Each cell has one
+   small outlined symbol at its top right (decision 15). */
 .stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-4);
-}
-
-/* Icon on the left; label, value and helper stacked on the right */
-.stats__item {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  grid-template-areas:
-    'icon label'
-    'icon value'
-    'icon helper';
-  align-content: center;
-  column-gap: var(--space-3);
-  min-width: 0;
-  padding: var(--space-4);
-  background: var(--color-surface);
+  margin: 0;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  background: var(--color-surface);
 }
 
-.stats__icon {
-  grid-area: icon;
-  align-self: center;
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-full);
-  background: var(--accent-soft);
-  color: var(--accent-ink);
+.stats__item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: var(--space-3) var(--space-5);
+  border-left: 1px solid var(--color-border);
 }
 
-.stats__icon .icon {
-  width: 22px;
-  height: 22px;
+.stats__item:first-child {
+  border-left: 0;
 }
 
-/* Yellow tiles get the full sunny bubble with a dark icon (9.55:1) */
-.stats__item.accent-sunny .stats__icon {
-  background: var(--color-sunny);
-  color: var(--color-on-sunny);
-}
-
+/* Label on the left, symbol on the right. Label lines are 20px tall, the
+   same as the symbol, so it lines up with the first line even when a long
+   label ("Most-used topic" on phones) wraps. */
 .stats__label {
-  grid-area: label;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
   color: var(--color-text-muted);
   font-size: var(--text-sm);
   font-weight: 500;
+  line-height: 20px;
+}
+
+.stats__label-text {
+  min-width: 0;
+}
+
+/* 20px rounded square: colored outline and glyph, no fill. The solid shades
+   are 3:1 or more on white (blue 5.17, sunny 4.92, mint 3.30, grape 5.70). */
+.stats__symbol {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid currentColor;
+  border-radius: 6px;
+}
+
+.stats__symbol .icon {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.4;
+}
+
+.stats__symbol--blue {
+  color: var(--color-primary);
+}
+
+.stats__symbol--sunny {
+  color: var(--sunny); /* darkened sunny #A16207 */
+}
+
+.stats__symbol--mint {
+  color: var(--mint); /* darkened mint #16A34A */
+}
+
+.stats__symbol--grape {
+  color: var(--grape);
 }
 
 .stats__value {
-  grid-area: value;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
   min-width: 0;
   font-family: var(--font-display);
-  font-size: var(--text-2xl);
+  font-size: var(--text-xl);
   font-weight: 800;
   line-height: var(--leading-tight);
-  font-variant-numeric: tabular-nums;
 }
 
-/* Topic chip as a value (most-used topic) */
+/* Topic name as a value (most-used topic) */
 .stats__value .topic-chip {
-  padding: 4px 12px;
   font-family: var(--font-sans);
   font-size: var(--text-base);
   font-weight: 700;
 }
 
 .stats__helper {
-  grid-area: helper;
-  overflow: hidden;
   color: var(--color-text-muted);
   font-size: var(--text-xs);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .stats__placeholder {
   display: block;
-  width: 64px;
-  height: 26px;
-  margin: 4px 0;
+  width: 56px;
+  height: 22px;
+  margin: 2px 0;
   border-radius: var(--radius-sm);
   background: var(--color-surface-2);
   animation: pulse 1.2s ease-in-out infinite;
 }
 
+/* Narrower screens: 2 x 2 cells */
 @media (max-width: 1100px) {
   .stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .stats__item:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .stats__item:nth-child(n + 3) {
+    border-top: 1px solid var(--color-border);
+  }
 }
 
-/* Phones: 2 x 2 compact tiles, icon above the text */
 @media (max-width: 559px) {
-  .stats {
-    gap: var(--space-3);
-  }
-
   .stats__item {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      'icon'
-      'label'
-      'value'
-      'helper';
-    padding: var(--space-3);
-  }
-
-  .stats__icon {
-    width: 40px;
-    height: 40px;
-    margin-bottom: var(--space-2);
-  }
-
-  .stats__value {
-    font-size: var(--text-xl);
-  }
-
-  /* Narrow tiles: wrap instead of cutting the helper off */
-  .stats__helper {
-    white-space: normal;
+    padding: var(--space-3) var(--space-4);
   }
 }
 

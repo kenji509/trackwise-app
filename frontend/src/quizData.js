@@ -2,8 +2,9 @@
 // Everything here is pure (same input, same output): no fetching, no React state.
 // The page calls these during render, so nothing derived is stored in state.
 
-// Card and topic colors from design-system/trackwise/MASTER.md (classes .accent-<name> in index.css)
-export const ACCENTS = ['coral', 'sunny', 'mint', 'grape']
+// Topic colors from design-system/trackwise/MASTER.md (classes .accent-<name> in index.css).
+// Mint, sunny and coral are left out: they mean Strong, Needs practice and Weak.
+export const ACCENTS = ['grape', 'cyan', 'fuchsia', 'slate']
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
@@ -20,9 +21,8 @@ function parseDate(value) {
 }
 
 // One "view" per quiz, combining the quiz with its questions:
-// { quiz, questionCount, topics: [{ topicId, name, accent, count }], accent, status, createdAt }
+// { quiz, questionCount, topics: [{ topicId, name, accent, count }], status, createdAt }
 // - topics: most-used first
-// - accent: color of the most-used topic (primary when there are no questions)
 // - status: 'published' when the quiz has questions, otherwise 'draft'
 export function buildQuizViews(quizzes, questions) {
   const byQuiz = new Map()
@@ -55,7 +55,6 @@ export function buildQuizViews(quizzes, questions) {
       quiz,
       questionCount,
       topics,
-      accent: topics[0]?.accent ?? 'primary',
       status: questionCount > 0 ? 'published' : 'draft',
       createdAt: parseDate(quiz.createdAt),
     }

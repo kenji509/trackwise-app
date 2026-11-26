@@ -75,13 +75,6 @@ export function resultSummary(result) {
   }
 }
 
-export function resultMessage(percent) {
-  if (percent === 100) return 'Perfect score! Every answer is correct.'
-  if (percent >= 80) return 'Great work! Check the few you missed below.'
-  if (percent >= 50) return 'Good effort. Review the questions you missed below.'
-  return 'Keep practicing. The answers below show where to focus next.'
-}
-
 export function choiceLetter(index) {
   return String.fromCharCode(65 + index)
 }

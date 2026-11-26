@@ -1,34 +1,30 @@
 import LevelBadge from './LevelBadge.jsx'
-import { LEVELS, levelRange } from '../progressData.js'
+import LevelBar, { LevelScale } from './LevelBar.jsx'
+import { LEVELS } from '../progressData.js'
 import './TopicAccuracy.css'
+
+const TICK_TEXT = LEVELS.filter((level) => level.min > 0)
+  .map((level) => `${level.label} starts at ${level.min}%`)
+  .join(' and ')
 
 function TopicAccuracy({ topics }) {
   return (
     <section className="topic-accuracy" aria-labelledby="topic-accuracy-title">
-      <div className="topic-accuracy__head">
-        <h3 id="topic-accuracy-title" className="topic-accuracy__title">
-          Accuracy per topic
-        </h3>
-        <ul className="topic-accuracy__key" aria-label="Levels">
-          {LEVELS.map((level) => (
-            <li key={level.id}>
-              <LevelBadge level={level} text={`${level.label}: ${levelRange(level)}`} />
-            </li>
-          ))}
-        </ul>
-      </div>
+      <h2 id="topic-accuracy-title" className="topic-accuracy__title">
+        Accuracy per topic
+      </h2>
+      <p className="sr-only">Each bar has a mark where {TICK_TEXT}.</p>
 
       <ul className="topic-accuracy__list">
-        {topics.map((topic) => (
-          <li key={topic.topicId} className={`topic-accuracy__item accent-${topic.level.accent}`}>
+        {topics.map((topic, index) => (
+          <li key={topic.topicId} className="topic-accuracy__item">
             <div className="topic-accuracy__top">
               <span className="topic-accuracy__name">{topic.name}</span>
               <span className="topic-accuracy__value">{topic.percent}%</span>
               <LevelBadge level={topic.level} />
             </div>
-            <div className="topic-accuracy__track" aria-hidden="true">
-              <span className="topic-accuracy__fill" style={{ width: `${topic.percent}%` }} />
-            </div>
+            {index === 0 && <LevelScale />}
+            <LevelBar percent={topic.percent} accent={topic.level.accent} />
             <p className="topic-accuracy__count">
               {topic.correct} of {topic.asked} answers correct
             </p>

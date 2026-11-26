@@ -11,14 +11,16 @@ const MAX_STAGGER = 8
 
 // One quiz, as a card (layout="grid") or a row (layout="list"). Same markup for
 // both; QuizCard.css rearranges it. item comes from buildQuizViews() in quizData.js.
+// A plain white card: the status is a word, and the 4px left edge repeats it
+// (mint for Published, sunny for Draft).
 function QuizCard({ item, layout, index = 0, deleting, deleteError, onEdit, onManage, onDelete }) {
-  const { quiz, questionCount, topics, accent, status, createdAt } = item
+  const { quiz, questionCount, topics, status, createdAt } = item
   const [confirming, setConfirming] = useState(false)
   const menuButtonRef = useRef(null)
   const titleId = `quiz-${quiz.quizId}-title`
   const confirmId = `quiz-${quiz.quizId}-confirm`
 
-  // Hide the confirmation, then put focus back on the ⋯ button.
+  // Hide the confirmation, then put focus back on the Manage button.
   // flushSync renders the change first so the focus lands reliably.
   function cancelDelete() {
     flushSync(() => setConfirming(false))
@@ -32,7 +34,7 @@ function QuizCard({ item, layout, index = 0, deleting, deleteError, onEdit, onMa
   const className = [
     'quiz-card',
     `quiz-card--${layout}`,
-    `accent-${accent}`,
+    `quiz-card--${status}`,
     confirming ? 'is-confirming' : '',
   ].join(' ')
 
@@ -42,15 +44,10 @@ function QuizCard({ item, layout, index = 0, deleting, deleteError, onEdit, onMa
       style={layout === 'grid' ? { '--i': Math.min(index, MAX_STAGGER) } : undefined}
       aria-labelledby={titleId}
     >
-      <div className="quiz-card__band">
-        {createdAt && (
-          <time className="quiz-card__date" dateTime={createdAt.toISOString()}>
-            <span className="sr-only">Created </span>
-            {formatDate(createdAt)}
-          </time>
-        )}
+      <div className="quiz-card__top">
+        <StatusBadge status={status} className="quiz-card__status" />
         <QuizMenu
-          label={`Actions for ${quiz.title}`}
+          label={`Manage ${quiz.title}`}
           buttonRef={menuButtonRef}
           onEdit={onEdit}
           onManage={onManage}
@@ -58,8 +55,6 @@ function QuizCard({ item, layout, index = 0, deleting, deleteError, onEdit, onMa
           disabled={deleting}
         />
       </div>
-
-      <StatusBadge status={status} className="quiz-card__status" />
 
       <div className="quiz-card__heading">
         <h3 id={titleId} className="quiz-card__title">
@@ -80,26 +75,24 @@ function QuizCard({ item, layout, index = 0, deleting, deleteError, onEdit, onMa
         topics={topics}
         max={layout === 'grid' ? 4 : 2}
         emptyText="No questions yet"
+        plain
         className="quiz-card__topics"
       />
 
       <p className="quiz-card__meta">
+        <span>{plural(questionCount, 'question')}</span>
         <span>
-          <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01" />
-          </svg>
-          {plural(questionCount, 'question')}
-        </span>
-        <span>
-          <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="12" cy="12" r="9" />
-            <path d="M12 7v5l3 2" />
-          </svg>
           <span className="sr-only">Time limit: </span>
           {quiz.timeLimitMin} min
         </span>
       </p>
+
+      {layout === 'list' && createdAt && (
+        <time className="quiz-card__date" dateTime={createdAt.toISOString()}>
+          <span className="sr-only">Created </span>
+          {formatDate(createdAt)}
+        </time>
+      )}
 
       {confirming && (
         <div className="quiz-card__confirm" role="group" aria-labelledby={confirmId} onKeyDown={handleConfirmKeyDown}>

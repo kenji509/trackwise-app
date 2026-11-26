@@ -2,16 +2,15 @@
   position: relative;
 }
 
+/* Text button in primary blue (5.17:1); a soft blue pill while hovered or open */
 .quiz-menu__button {
-  color: var(--accent-ink, var(--color-text-muted));
+  min-height: var(--touch-target);
+  padding: 0 var(--space-3);
+  font-size: var(--text-sm);
 }
 
-/* Solid white disc + small shadow: visible on the colored band and on white rows */
-.quiz-menu__button:hover:not(:disabled),
 .quiz-menu__button[aria-expanded='true'] {
-  background: var(--color-surface);
-  box-shadow: 0 1px 4px rgb(15 23 42 / 0.14);
-  color: var(--accent-ink, var(--color-text));
+  background: var(--color-primary-soft);
 }
 
 .quiz-menu__list {

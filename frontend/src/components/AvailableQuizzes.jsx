@@ -4,16 +4,11 @@ function AvailableQuizzes({ loading, loadError, onRetry, count, children }) {
   const isReady = !loading && !loadError
 
   return (
-    <section className="available" aria-labelledby="available-heading" aria-busy={loading}>
-      <h2 id="available-heading" className="available__heading">
-        Pick a quiz to start
-      </h2>
-
+    <div className="available" aria-busy={loading}>
       {loading && (
         <div className="available__grid" aria-hidden="true">
           {[1, 2, 3].map((n) => (
             <div key={n} className="skeleton-card skeleton-card--grid">
-              <span className="skeleton skeleton--band" />
               <span className="skeleton skeleton--title" />
               <span className="skeleton skeleton--short" />
               <span className="skeleton skeleton--chips" />
@@ -24,7 +19,7 @@ function AvailableQuizzes({ loading, loadError, onRetry, count, children }) {
 
       {loadError && (
         <div className="empty empty--error" role="alert">
-          <h3 className="empty__title">Couldn’t load quizzes</h3>
+          <h2 className="empty__title">Couldn’t load quizzes</h2>
           <p className="empty__text">{loadError}</p>
           <div className="empty__actions">
             <button type="button" className="btn btn-primary" onClick={onRetry}>
@@ -47,13 +42,13 @@ function AvailableQuizzes({ loading, loadError, onRetry, count, children }) {
             <path d="M166 26v8l5 3" fill="none" stroke="var(--color-on-sunny)" strokeWidth="2.5" strokeLinecap="round" />
             <path d="M44 34c1 5 2 6 7 7-5 1-6 2-7 7-1-5-2-6-7-7 5-1 6-2 7-7z" fill="var(--color-sunny)" />
           </svg>
-          <h3 className="empty__title">No quizzes to take yet</h3>
+          <h2 className="empty__title">No quizzes to take yet</h2>
           <p className="empty__text">When your teacher publishes a quiz, it shows up here.</p>
         </div>
       )}
 
       {isReady && count > 0 && <div className="available__grid">{children}</div>}
-    </section>
+    </div>
   )
 }
 

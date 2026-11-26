@@ -1,7 +1,7 @@
 import { formatDate } from '../quizData.js'
 import './QuestionManager.css'
 
-function QuestionManager({ quiz, questionCount, state, loadError, saveError, list, onRetry, onAdd, children }) {
+function QuestionManager({ quiz, state, loadError, saveError, list, onRetry, onAdd, children }) {
   const created = quiz.createdAt ? new Date(quiz.createdAt) : null
 
   return (
@@ -24,10 +24,6 @@ function QuestionManager({ quiz, questionCount, state, loadError, saveError, lis
             <div>
               <dt>Time limit</dt>
               <dd>{quiz.timeLimitMin} min</dd>
-            </div>
-            <div>
-              <dt>Questions</dt>
-              <dd>{state === 'loading' ? '…' : questionCount}</dd>
             </div>
             {created && !Number.isNaN(created.getTime()) && (
               <div>
@@ -67,9 +63,6 @@ function QuestionManager({ quiz, questionCount, state, loadError, saveError, lis
         {state === 'empty' && (
           <div className="question-manager__placeholder">
             <h2 className="question-manager__placeholder-title">This quiz has no questions yet</h2>
-            <p className="question-manager__placeholder-text">
-              Add a question, pick its topic, write four choices and mark the correct one.
-            </p>
             <button type="button" className="btn btn-primary" onClick={onAdd}>
               <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 5v14M5 12h14" />

@@ -124,7 +124,6 @@ function Quizzes({
         <div className={layout === 'list' ? 'quizzes__list' : 'quizzes__grid'} aria-hidden="true">
           {[1, 2, 3].map((n) => (
             <div key={n} className={`skeleton-card skeleton-card--${layout}`}>
-              <span className="skeleton skeleton--band" />
               <span className="skeleton skeleton--title" />
               <span className="skeleton skeleton--short" />
               <span className="skeleton skeleton--chips" />
@@ -155,9 +154,6 @@ function Quizzes({
         <div className="empty">
           <EmptyIllustration />
           <h3 className="empty__title">Let’s make your first quiz</h3>
-          <p className="empty__text">
-            Quizzes you create show up here with their topics, question count and status.
-          </p>
           <div className="empty__actions">
             <button type="button" className="btn btn-primary" onClick={onAdd}>
               <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">

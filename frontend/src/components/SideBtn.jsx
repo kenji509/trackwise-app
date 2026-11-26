@@ -1,7 +1,6 @@
 import './SideBtn.css'
 
-// Outline icons on a 24px grid, one per page. Questions and Topics match the
-// icons on the stat tiles (QuizStats).
+// Outline icons on a 24px grid, one per page.
 const icons = {
   dashboard: (
     <>
@@ -54,8 +53,8 @@ function ignoreClick(event) {
 }
 
 // One navigation link (see navSections in main.jsx).
-// demo: a placeholder for a page that isn't built yet. It looks like the other
-// items, does nothing when clicked, and is announced as unavailable.
+// demo: a placeholder for a page that isn't built yet. It carries a small
+// "Soon" tag, does nothing when clicked, and is announced as unavailable.
 function SideBtn({ icon, label, active, demo }) {
   return (
     <li>
@@ -65,7 +64,7 @@ function SideBtn({ icon, label, active, demo }) {
         aria-current={active ? 'page' : undefined}
         aria-disabled={demo ? true : undefined}
         onClick={demo ? ignoreClick : undefined}
-        title={label}
+        title={demo ? `${label} (soon)` : label}
       >
         <span className="side-btn__icon">
           <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -73,6 +72,7 @@ function SideBtn({ icon, label, active, demo }) {
           </svg>
         </span>
         <span className="side-btn__label">{label}</span>
+        {demo && <span className="side-btn__soon">Soon</span>}
       </a>
     </li>
   )

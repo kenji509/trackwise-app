@@ -35,6 +35,7 @@ import QuestionManager from './components/QuestionManager.jsx'
 import QuestionList from './components/QuestionList.jsx'
 import QuestionEditor from './components/QuestionEditor.jsx'
 import MyProgress from './components/MyProgress.jsx'
+import ProgressSummary from './components/ProgressSummary.jsx'
 import QuizHistory from './components/QuizHistory.jsx'
 import * as api from './api.js'
 import { emptyForm, toForm, toRequestBody, validateQuiz } from './quizForm.js'
@@ -84,7 +85,7 @@ import {
   topicOptions,
 } from './quizData.js'
 import { makeSampleData } from './sampleData.js'
-import { buildProgress, historyViews } from './progressData.js'
+import { buildProgress, historyViews, lastScores } from './progressData.js'
 
 // Navigation. Quizzes is the only built page; items marked demo are
 // placeholders for the demo: clicking them does nothing (see SideBtn).
@@ -267,9 +268,9 @@ function App({ user, onLogout }) {
 
   useEffect(() => {
     if (!managedQuiz) return
-    document.title = `Questions: ${managedQuiz.title} · TrackWise`
+    document.title = `Questions: ${managedQuiz.title} – TrackWise`
     return () => {
-      document.title = 'Quizzes · TrackWise'
+      document.title = 'Quizzes – TrackWise'
     }
   }, [managedQuiz])
 
@@ -379,38 +380,23 @@ function App({ user, onLogout }) {
   const teacherChoices = teacherOptions(teachers, items)
   const topicChoices = topicOptions(topics, items)
 
+  // symbol + tone: the small outlined symbol at each cell's top right (QuizStats)
   const statTiles = [
     {
       id: 'quizzes',
-      icon: 'quizzes',
-      accent: 'sunny',
       label: 'Quizzes',
+      symbol: 'clipboard',
+      tone: 'blue',
       value: stats.quizCount,
-      helper: `${stats.publishedCount} published · ${plural(stats.draftCount, 'draft')}`,
+      helper: `${stats.publishedCount} published, ${plural(stats.draftCount, 'draft')}`,
     },
-    {
-      id: 'questions',
-      icon: 'questions',
-      accent: 'primary',
-      label: 'Questions',
-      value: stats.questionTotal,
-      helper: stats.quizCount
-        ? `About ${Math.round(stats.questionTotal / stats.quizCount)} per quiz`
-        : 'None yet',
-    },
-    {
-      id: 'week',
-      icon: 'week',
-      accent: 'mint',
-      label: 'New this week',
-      value: stats.thisWeek,
-      helper: 'Created in the last 7 days',
-    },
+    { id: 'questions', label: 'Questions', symbol: 'question', tone: 'sunny', value: stats.questionTotal },
+    { id: 'week', label: 'New this week', symbol: 'sparkle', tone: 'mint', value: stats.thisWeek },
     {
       id: 'topic',
-      icon: 'topic',
-      accent: stats.topTopic ? stats.topTopic.accent : 'coral',
       label: 'Most-used topic',
+      symbol: 'chart',
+      tone: 'grape',
       value: stats.topTopic ? (
         <span className={`topic-chip accent-${stats.topTopic.accent}`}>{stats.topTopic.name}</span>
       ) : (
@@ -420,7 +406,8 @@ function App({ user, onLogout }) {
     },
   ]
 
-  let heroSummary = `${plural(stats.quizCount, 'quiz', 'quizzes')} · ${plural(stats.questionTotal, 'question')} · ${plural(stats.topicCount, 'topic')}`
+  // The strip below already shows the counts, so the banner only speaks up while loading or on errors
+  let heroSummary = ''
   if (loading) heroSummary = 'Loading your quizzes…'
   if (loadError) heroSummary = 'Your quizzes will appear here once the server is reachable.'
 
@@ -804,7 +791,7 @@ function App({ user, onLogout }) {
                   <path d="M19 12H5" />
                   <path d="m12 19-7-7 7-7" />
                 </svg>
-                <span className="quiz-layout__exit-label">Back to quizzes</span>
+                <span className="quiz-layout__exit-label">Back to Quizzes</span>
               </button>
               <button
                 type="button"
@@ -823,7 +810,6 @@ function App({ user, onLogout }) {
         >
           <QuestionManager
             quiz={managedQuiz}
-            questionCount={drafts.length}
             state={managerState}
             loadError={draftsError}
             saveError={draftSaveError}
@@ -926,7 +912,7 @@ function App({ user, onLogout }) {
 
           <MainContent
             notice={sampleMode && <SampleNotice onTurnOff={() => changeSampleMode(false)} />}
-            eyebrow={`${greeting(now)}, Teacher`}
+            eyebrow={`${greeting(now)}, ${firstName(user.fullName)}`}
             title="Quizzes"
             summary={heroSummary}
             actionLabel="New quiz"
@@ -1101,7 +1087,9 @@ function StudentApp({ user, onLogout }) {
   const taking = attempt !== null && finished === null
   const deadline = attempt ? attempt.deadline : 0
   const resultReady = result !== null && result.attemptId === resultId
-  const needsAttempts = attempt === null && resultId === null && page !== 'quizzes'
+  // Past attempts feed My Progress, Quiz History and the "Last score" line on
+  // the Available Quizzes cards; they reload each time the student comes back.
+  const needsAttempts = attempt === null && resultId === null
   const attemptsLoading = pastAttempts === null && attemptsError === ''
 
   let screenTitle = STUDENT_PAGE_TITLES[page]
@@ -1131,7 +1119,7 @@ function StudentApp({ user, onLogout }) {
   }, [loadAttempt])
 
   useEffect(() => {
-    document.title = `${screenTitle} · TrackWise`
+    document.title = `${screenTitle} – TrackWise`
   }, [screenTitle])
 
   useEffect(() => {
@@ -1358,7 +1346,7 @@ function StudentApp({ user, onLogout }) {
     setAttemptsLoad(attemptsLoad + 1)
   }
 
-  const resultBackLabel = RESULT_BACK_LABELS[resultOrigin] ?? 'Back to quizzes'
+  const resultBackLabel = RESULT_BACK_LABELS[resultOrigin] ?? 'Back to Available Quizzes'
 
   if (attempt && finished) {
     const timedOut = finished === 'time'
@@ -1560,65 +1548,16 @@ function StudentApp({ user, onLogout }) {
 
   let heroSummary
   let pageContent
+  // The animated quiz-sheet drawing shows only when at least one quiz can be taken
+  let heroArt = 'none'
 
   if (page === 'progress') {
     const progress = pastAttempts ? buildProgress(pastAttempts) : null
-    const strongest = progress?.strongest ?? null
-    const review = progress?.weakest && progress.weakest.level.id !== 'strong' ? progress.weakest : null
-    const tiles = [
-      {
-        id: 'taken',
-        icon: 'quizzes',
-        accent: 'primary',
-        label: 'Quizzes taken',
-        value: progress ? progress.quizzesTaken : '',
-        helper: progress ? `Across ${plural(progress.distinctQuizzes, 'quiz', 'quizzes')}` : '',
-      },
-      {
-        id: 'average',
-        icon: 'average',
-        accent: progress?.averageLevel?.accent ?? 'primary',
-        label: 'Average score',
-        value: progress?.averagePercent != null ? `${progress.averagePercent}%` : '—',
-        helper: progress?.averageLevel
-          ? `${progress.averageLevel.label} · mean of ${plural(progress.gradedCount, 'quiz', 'quizzes')}`
-          : '',
-      },
-      {
-        id: 'strongest',
-        icon: 'strong',
-        accent: strongest ? strongest.level.accent : 'mint',
-        label: 'Strongest topic',
-        value: strongest ? (
-          <span className={`topic-chip accent-${strongest.level.accent}`}>{strongest.name}</span>
-        ) : (
-          '—'
-        ),
-        helper: strongest ? `${strongest.percent}% correct · ${strongest.level.label}` : 'No topics yet',
-      },
-      {
-        id: 'review',
-        icon: 'review',
-        accent: review ? review.level.accent : 'mint',
-        label: 'Needs review',
-        value: review ? <span className={`topic-chip accent-${review.level.accent}`}>{review.name}</span> : 'Nothing',
-        helper: review ? `${review.percent}% correct · ${review.level.label}` : 'Every topic is Strong',
-      },
-    ]
+    const showSummary = !attemptsError && (attemptsLoading || (progress !== null && progress.quizzesTaken > 0))
 
-    heroSummary = 'Loading your progress…'
-    if (progress) {
-      heroSummary =
-        progress.quizzesTaken === 0
-          ? 'Take a quiz to start tracking your progress.'
-          : `${plural(progress.quizzesTaken, 'quiz', 'quizzes')} taken · ${progress.averagePercent ?? 0}% average score`
-    }
-    if (attemptsError) heroSummary = 'Your progress will appear here once the server is reachable.'
-
-    const showTiles = !attemptsError && (attemptsLoading || (progress !== null && progress.quizzesTaken > 0))
     pageContent = (
       <>
-        {showTiles && <QuizStats items={tiles} loading={attemptsLoading} />}
+        {showSummary && <ProgressSummary loading={attemptsLoading} progress={progress} />}
         <MyProgress
           loading={attemptsLoading}
           loadError={attemptsError}
@@ -1631,13 +1570,6 @@ function StudentApp({ user, onLogout }) {
   } else if (page === 'history') {
     const views = pastAttempts ? historyViews(pastAttempts) : null
 
-    heroSummary = 'Loading your quiz history…'
-    if (views) {
-      heroSummary =
-        views.length === 0 ? 'Quizzes you finish are listed here.' : `${plural(views.length, 'quiz', 'quizzes')} taken`
-    }
-    if (attemptsError) heroSummary = 'Your quiz history will appear here once the server is reachable.'
-
     pageContent = (
       <QuizHistory
         loading={attemptsLoading}
@@ -1649,10 +1581,13 @@ function StudentApp({ user, onLogout }) {
     )
   } else {
     const available = availableQuizViews(buildQuizViews(quizzes, questions))
+    // undefined while attempts load (the card leaves the line out), else a Map
+    const scores = pastAttempts && !attemptsError ? lastScores(pastAttempts) : undefined
 
     heroSummary = `${plural(available.length, 'quiz', 'quizzes')} ready to take`
     if (loading) heroSummary = 'Loading your quizzes…'
     if (loadError) heroSummary = 'Your quizzes will appear here once the server is reachable.'
+    if (!loading && !loadError && available.length > 0) heroArt = 'drawing'
 
     pageContent = (
       <AvailableQuizzes loading={loading} loadError={loadError} onRetry={retryLoad} count={available.length}>
@@ -1661,6 +1596,7 @@ function StudentApp({ user, onLogout }) {
             key={item.quiz.quizId}
             item={item}
             index={index}
+            lastPercent={scores && (scores.get(item.quiz.quizId) ?? null)}
             starting={startingId === item.quiz.quizId}
             error={startError?.quizId === item.quiz.quizId ? startError.message : ''}
             onStart={() => startQuiz(item.quiz)}
@@ -1692,6 +1628,8 @@ function StudentApp({ user, onLogout }) {
             eyebrow={`${greeting(now)}, ${firstName(user.fullName)}`}
             title={STUDENT_PAGE_TITLES[page]}
             summary={heroSummary}
+            plain={page !== 'quizzes'}
+            art={heroArt}
           >
             {pageContent}
           </MainContent>
@@ -1724,7 +1662,7 @@ function Root() {
 
   useEffect(() => {
     if (studentNamesPage) return
-    document.title = `${pageTitle} · TrackWise`
+    document.title = `${pageTitle} – TrackWise`
   }, [pageTitle, studentNamesPage])
 
   useEffect(() => {

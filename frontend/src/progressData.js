@@ -5,6 +5,8 @@ export const LEVELS = [
 ]
 
 export const TREND_LENGTH = 6
+export const RECENT_LENGTH = 3
+export const REVIEW_LENGTH = 2
 
 export function levelFor(percent) {
   return LEVELS.find((level) => percent >= level.min)
@@ -12,14 +14,6 @@ export function levelFor(percent) {
 
 export function levelThresholds() {
   return LEVELS.filter((level) => level.min > 0).map((level) => level.min)
-}
-
-export function levelRange(level) {
-  const index = LEVELS.indexOf(level)
-  if (index === 0) return `${level.min}% or more`
-  const nextMin = LEVELS[index - 1].min
-  if (level.min === 0) return `under ${nextMin}%`
-  return `${level.min}–${nextMin - 1}%`
 }
 
 export function percentOf(correct, total) {
@@ -54,6 +48,7 @@ export function attemptView(attempt) {
   const percent = percentOf(attempt.score, total)
   return {
     attemptId: attempt.attemptId,
+    quizId: attempt.quiz?.quizId ?? null,
     title: attempt.quiz?.title || 'Quiz',
     submittedAt: toDate(attempt.submittedAt),
     score: attempt.score,
@@ -111,6 +106,8 @@ export function buildProgress(attempts) {
     ? Math.round(graded.reduce((sum, view) => sum + (view.score / view.total) * 100, 0) / graded.length)
     : null
 
+  const needsPractice = [...topicList].reverse().filter((topic) => topic.level.id !== 'strong')
+
   const trend = graded
     .slice(0, TREND_LENGTH)
     .reverse()
@@ -119,15 +116,21 @@ export function buildProgress(attempts) {
   return {
     views,
     quizzesTaken: views.length,
-    distinctQuizzes: new Set(views.map((view) => view.title)).size,
-    gradedCount: graded.length,
     averagePercent,
-    averageLevel: averagePercent === null ? null : levelFor(averagePercent),
     topics: topicList,
-    strongest: topicList[0] || null,
-    weakest: topicList.length ? topicList[topicList.length - 1] : null,
-    review: [...topicList].reverse().slice(0, 2),
+    strongest: topicList.find((topic) => topic.level.id === 'strong') || null,
+    needsPractice: needsPractice[0] || null,
+    practice: needsPractice.slice(0, REVIEW_LENGTH),
     trend,
-    recent: views.slice(0, TREND_LENGTH),
+    recent: views.slice(0, RECENT_LENGTH),
   }
+}
+
+// Newest score (percent) per quiz id, for the Available Quizzes cards
+export function lastScores(attempts) {
+  const scores = new Map()
+  for (const view of historyViews(attempts)) {
+    if (view.quizId !== null && !scores.has(view.quizId)) scores.set(view.quizId, view.percent)
+  }
+  return scores
 }

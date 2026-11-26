@@ -13,8 +13,7 @@ function NoAttempts() {
         <path d="M170 29v14M163 36h14" stroke="var(--color-on-sunny)" strokeWidth="2.5" strokeLinecap="round" />
         <path d="M44 38c1 5 2 6 7 7-5 1-6 2-7 7-1-5-2-6-7-7 5-1 6-2 7-7z" fill="var(--color-sunny)" />
       </svg>
-      <h3 className="empty__title">No quizzes taken yet</h3>
-      <p className="empty__text">Take your first quiz and your scores, topic progress and history will show up here.</p>
+      <h2 className="empty__title">No quizzes taken yet</h2>
       <div className="empty__actions">
         <a href="#quizzes" className="btn btn-primary">
           Go to Available Quizzes

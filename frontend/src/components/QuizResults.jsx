@@ -1,6 +1,6 @@
 import AnswerReview from './AnswerReview.jsx'
 import TopicBreakdown from './TopicBreakdown.jsx'
-import { resultMessage, resultSummary } from '../quizAttempt.js'
+import { resultSummary } from '../quizAttempt.js'
 import './QuizResults.css'
 
 const submittedFormat = new Intl.DateTimeFormat('en-US', {
@@ -16,9 +16,15 @@ function submittedText(value) {
   return Number.isNaN(date.getTime()) ? '' : `Submitted ${submittedFormat.format(date)}`
 }
 
-function QuizResults({ result, timedOut, onDone, doneLabel = 'Back to quizzes' }) {
+function QuizResults({ result, timedOut, onDone, doneLabel = 'Back to Available Quizzes' }) {
   const summary = resultSummary(result)
   const submitted = submittedText(result.submittedAt)
+  const misses = [
+    summary.wrong > 0 && `${summary.wrong} incorrect`,
+    summary.unanswered > 0 && `${summary.unanswered} unanswered`,
+  ]
+    .filter(Boolean)
+    .join(', ')
 
   return (
     <div className="quiz-results">
@@ -62,30 +68,7 @@ function QuizResults({ result, timedOut, onDone, doneLabel = 'Back to quizzes' }
           </p>
         </div>
 
-        <p className="quiz-results__message">{resultMessage(summary.percent)}</p>
-
-        <ul className="quiz-results__counts" aria-label="Answer summary">
-          <li className="quiz-results__count quiz-results__count--correct">
-            <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="m5 12.5 4.5 4.5L19 7.5" />
-            </svg>
-            {summary.score} correct
-          </li>
-          <li className="quiz-results__count quiz-results__count--wrong">
-            <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" />
-            </svg>
-            {summary.wrong} incorrect
-          </li>
-          {summary.unanswered > 0 && (
-            <li className="quiz-results__count quiz-results__count--unanswered">
-              <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M6 12h12" />
-              </svg>
-              {summary.unanswered} unanswered
-            </li>
-          )}
-        </ul>
+        {misses && <p className="quiz-results__misses">{misses}</p>}
       </section>
 
       <section className="quiz-results__card quiz-results__topics" aria-labelledby="results-topics-title">

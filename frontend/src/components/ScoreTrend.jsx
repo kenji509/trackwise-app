@@ -60,14 +60,9 @@ function ScoreTrend({ points }) {
 
   return (
     <section className="score-trend" aria-labelledby="score-trend-title">
-      <div className="score-trend__head">
-        <h3 id="score-trend-title" className="score-trend__title">
-          Score trend
-        </h3>
-        <p className="score-trend__sub">
-          {count === 1 ? 'Your only quiz so far' : `Your last ${count} quizzes, oldest to newest`}
-        </p>
-      </div>
+      <h2 id="score-trend-title" className="score-trend__title">
+        Score trend
+      </h2>
 
       <div
         ref={frameRef}
@@ -131,8 +126,9 @@ function ScoreTrend({ points }) {
             <strong className="score-trend__tooltip-value">{current.percent}%</strong>
             <span className="score-trend__tooltip-title">{current.title}</span>
             <span className="score-trend__tooltip-meta">
-              {current.score} / {current.total} · {formatDateTime(current.submittedAt)}
+              {current.score} / {current.total} correct
             </span>
+            <span className="score-trend__tooltip-meta">{formatDateTime(current.submittedAt)}</span>
           </div>
         )}
       </div>
@@ -142,7 +138,6 @@ function ScoreTrend({ points }) {
           ? `Quiz number ${current.number}, ${current.title}: ${current.percent}%, ${current.score} of ${current.total} correct, ${formatDateTime(current.submittedAt)}.`
           : ''}
       </p>
-      <p className="score-trend__note">The 50% and 80% lines mark where Needs practice and Strong begin.</p>
     </section>
   )
 }

@@ -17,17 +17,7 @@
 }
 
 .question-editor__title {
-  margin-left: -4px;
-  padding: 0 4px;
   font-size: var(--text-xl);
-  background: linear-gradient(
-    transparent 60%,
-    var(--color-sunny-hover) 60%,
-    var(--color-sunny-hover) 92%,
-    transparent 92%
-  );
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
 }
 
 .question-editor__title:focus {

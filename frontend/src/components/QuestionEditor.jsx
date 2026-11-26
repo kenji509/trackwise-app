@@ -27,7 +27,7 @@ function QuestionEditor({
           Question {number}
           <span className="question-editor__of"> of {total}</span>
         </h2>
-        {draft.questionId === null && <span className="question-editor__new">Not saved yet</span>}
+        {draft.questionId === null && <span className="question-editor__new">Unsaved</span>}
         <button
           type="button"
           className="btn btn-ghost question-editor__delete"

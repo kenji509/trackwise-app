@@ -130,6 +130,15 @@
   inset: -4px 0;
 }
 
+/* Desktop: cap the selects so search, the three selects and the view toggle
+   share one row inside the 1100px content width. The open list still shows
+   full names; only a long chosen name ends in "…". */
+@media (min-width: 1101px) {
+  .toolbar__controls .select-field__control {
+    max-width: 9.5rem;
+  }
+}
+
 /* Tablet and phone: search on its own row, then the selects share the next
    row(s) evenly instead of leaving ragged gaps */
 @media (max-width: 1100px) {

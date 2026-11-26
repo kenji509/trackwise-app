@@ -12,10 +12,11 @@ function errorIcon() {
 }
 
 function ChoiceFields({ choices, correct, error, choiceErrors, onText, onCorrect }) {
-  const describedBy = ['choice-fields-hint', error && 'choice-fields-error'].filter(Boolean).join(' ')
+  const hasCorrect = correct !== null
+  const describedBy = [hasCorrect && 'choice-fields-hint', error && 'choice-fields-error'].filter(Boolean).join(' ')
 
   return (
-    <fieldset className="choice-fields" aria-describedby={describedBy}>
+    <fieldset className="choice-fields" aria-describedby={describedBy || undefined}>
       <legend className="choice-fields__legend">
         Answer choices
         <span className="field__required" aria-hidden="true">
@@ -23,15 +24,11 @@ function ChoiceFields({ choices, correct, error, choiceErrors, onText, onCorrect
         </span>
       </legend>
 
-      <p id="choice-fields-hint" className="choice-fields__hint">
-        {correct === null ? (
-          'Fill in all four choices, then select the circle next to the correct one.'
-        ) : (
-          <>
-            Correct answer: <strong>{choiceLetter(correct)}</strong>
-          </>
-        )}
-      </p>
+      {hasCorrect && (
+        <p id="choice-fields-hint" className="choice-fields__hint">
+          Correct answer: <strong>{choiceLetter(correct)}</strong>
+        </p>
+      )}
 
       {error && (
         <p id="choice-fields-error" className="choice-fields__error">

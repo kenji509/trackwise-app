@@ -32,10 +32,10 @@
 
 .topic-breakdown__name::before {
   content: '';
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   flex-shrink: 0;
-  border-radius: 50%;
+  border-radius: 2px;
   background: var(--accent);
 }
 
@@ -47,20 +47,6 @@
 
 .topic-breakdown__count strong {
   color: var(--color-text);
-}
-
-.topic-breakdown__bar {
-  height: 12px;
-  overflow: hidden;
-  border-radius: var(--radius-full);
-  background: var(--color-surface-2);
-}
-
-.topic-breakdown__fill {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--color-primary);
 }
 
 .topic-breakdown__empty {

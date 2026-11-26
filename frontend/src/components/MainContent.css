@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: var(--space-5);
   width: 100%;
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: var(--space-6) var(--space-6) var(--space-8);
 }
@@ -11,6 +11,37 @@
 /* Focused by the skip link; no ring needed on the whole page */
 .main:focus {
   outline: none;
+}
+
+/* ===== Simple header for secondary pages (no banner, no drawing) ===== */
+.page-head {
+  padding-top: var(--space-2);
+}
+
+.page-head__title {
+  width: fit-content;
+  margin-left: -4px;
+  padding: 0 4px;
+  font-size: 2rem;
+  letter-spacing: -0.01em;
+  background: linear-gradient(
+    transparent 60%,
+    var(--color-sunny-hover) 60%,
+    var(--color-sunny-hover) 92%,
+    transparent 92%
+  );
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+@media (max-width: 767px) {
+  .page-head {
+    padding-top: 0;
+  }
+
+  .page-head__title {
+    font-size: 1.75rem;
+  }
 }
 
 /* ===== Welcome banner: royal blue with a small classroom drawing ===== */
@@ -61,6 +92,22 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* "New quiz": lifts 2px on hover with a soft shadow under its yellow lip.
+   Not while pressed, so the press-down from .btn-light:active still applies. */
+.hero__action:hover:not(:disabled):not(:active) {
+  box-shadow:
+    0 var(--lip) 0 var(--color-sunny-lip),
+    0 8px 16px rgb(15 23 42 / 0.24);
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Keep the deeper shadow as the hover cue, without the movement */
+  .hero__action:hover:not(:disabled):not(:active) {
+    transform: none;
+  }
+}
+
 /* Decorative shapes (aria-hidden spans in MainContent.jsx).
    They must never sit behind text: see the media query below. */
 .hero__blob {
@@ -78,7 +125,8 @@
   background: rgb(255 255 255 / 0.1);
 }
 
-/* Quiz sheet: blue title bar and three answer lines */
+/* Quiz sheet: blue title bar, then three answer lines (child spans, so the
+   student banner can draw them in one by one) */
 .hero__blob--berry {
   top: 22px;
   right: 250px;
@@ -87,12 +135,31 @@
   border-radius: 14px;
   background:
     linear-gradient(var(--color-primary) 0 0) 16px 18px / 44px 9px no-repeat,
-    linear-gradient(var(--color-border-strong) 0 0) 40px 42px / 74px 7px no-repeat,
-    linear-gradient(var(--color-border-strong) 0 0) 40px 62px / 58px 7px no-repeat,
-    linear-gradient(var(--color-border-strong) 0 0) 40px 82px / 66px 7px no-repeat,
     #ffffff;
   box-shadow: 0 12px 24px rgb(15 23 42 / 0.25);
   transform: rotate(-7deg);
+}
+
+.hero__line {
+  position: absolute;
+  left: 40px;
+  height: 7px;
+  background: var(--color-border-strong);
+}
+
+.hero__line--1 {
+  top: 42px;
+  width: 74px;
+}
+
+.hero__line--2 {
+  top: 62px;
+  width: 58px;
+}
+
+.hero__line--3 {
+  top: 82px;
+  width: 66px;
 }
 
 /* Two ticked boxes and one empty box on the sheet */
@@ -149,6 +216,72 @@
   border: solid #14532d;
   border-width: 0 3px 3px 0;
   transform: rotate(45deg);
+}
+
+/* ===== Drawing entrance (art="drawing": teacher and student banners) =====
+   Transform and opacity only. The resting styles above are the final state,
+   so with reduced motion (animation: none) the drawing simply shows.
+   1. The three answer lines draw in from the left, one after another (0–0.6s).
+   2. The green check pops in with a small bounce (0.6–1.05s).
+   3. The sun bobs 4px up and down, 4s per cycle. */
+.hero--drawing .hero__line {
+  transform-origin: left center;
+  animation: hero-line-in 300ms var(--ease-out) both;
+}
+
+.hero--drawing .hero__line--2 {
+  animation-delay: 150ms;
+}
+
+.hero--drawing .hero__line--3 {
+  animation-delay: 300ms;
+}
+
+.hero--drawing .hero__blob--mint {
+  animation: hero-check-pop 450ms var(--ease-out) 600ms both;
+}
+
+.hero--drawing .hero__blob--sunny {
+  animation: hero-sun-bob 4s ease-in-out infinite;
+}
+
+@keyframes hero-line-in {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+}
+
+@keyframes hero-check-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes hero-sun-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero--drawing .hero__line,
+  .hero--drawing .hero__blob--mint,
+  .hero--drawing .hero__blob--sunny {
+    animation: none;
+  }
 }
 
 /* The drawing would sit behind the text on narrower screens */

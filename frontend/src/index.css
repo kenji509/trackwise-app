@@ -22,7 +22,8 @@
   --color-sunny-lip: #ca8a04;
   --color-on-sunny: #1e293b;
 
-  /* Card and topic accents.
+  /* Accents. Mint, sunny and coral mean status (Strong, Needs practice, Weak;
+     Published and Draft). Grape, cyan, fuchsia and slate are topic colors.
      soft = background, ink = text (4.5:1+ on soft and white),
      solid = dots next to text (3:1+ on white), bright = decoration only */
   --coral-soft: #ffe4e6;
@@ -41,6 +42,19 @@
   --grape-ink: #5b21b6;
   --grape: #7c3aed;
   --grape-bright: #a78bfa;
+  /* Topic-only colors: kept away from mint, sunny and coral, which mean status */
+  --cyan-soft: #cffafe;
+  --cyan-ink: #155e75;
+  --cyan: #0891b2; /* 3.68:1 on white */
+  --cyan-bright: #22d3ee;
+  --fuchsia-soft: #fae8ff;
+  --fuchsia-ink: #86198f;
+  --fuchsia: #c026d3; /* 4.71:1 on white */
+  --fuchsia-bright: #e879f9;
+  --slate-soft: #f1f5f9;
+  --slate-ink: #334155;
+  --slate: #64748b; /* 4.76:1 on white */
+  --slate-bright: #94a3b8;
 
   /* Status */
   --color-danger: #b91c1c; /* text: 6.47:1 on white */
@@ -123,7 +137,7 @@
 }
 
 /* Accent helpers: set --accent / --accent-soft / --accent-ink / --accent-bright
-   on an element. Blue is for quizzes with no topics yet. */
+   on an element. */
 .accent-primary {
   --accent: var(--color-primary);
   --accent-soft: var(--color-primary-soft);
@@ -153,6 +167,24 @@
   --accent-soft: var(--grape-soft);
   --accent-ink: var(--grape-ink);
   --accent-bright: var(--grape-bright);
+}
+.accent-cyan {
+  --accent: var(--cyan);
+  --accent-soft: var(--cyan-soft);
+  --accent-ink: var(--cyan-ink);
+  --accent-bright: var(--cyan-bright);
+}
+.accent-fuchsia {
+  --accent: var(--fuchsia);
+  --accent-soft: var(--fuchsia-soft);
+  --accent-ink: var(--fuchsia-ink);
+  --accent-bright: var(--fuchsia-bright);
+}
+.accent-slate {
+  --accent: var(--slate);
+  --accent-soft: var(--slate-soft);
+  --accent-ink: var(--slate-ink);
+  --accent-bright: var(--slate-bright);
 }
 
 /* ===== Base ===== */

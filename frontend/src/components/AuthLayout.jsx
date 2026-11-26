@@ -17,9 +17,6 @@ function AuthLayout({ title, subtitle, footer, children }) {
             Know which topics you are <span className="auth__mark">strong in</span>, not just your
             score.
           </p>
-          <p className="auth__lead">
-            Quizzes that track progress topic by topic, for students and their teachers.
-          </p>
         </div>
 
         <svg className="auth__art" viewBox="0 0 320 210" aria-hidden="true">

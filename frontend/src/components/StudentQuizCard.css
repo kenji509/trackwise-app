@@ -1,8 +1,9 @@
+/* Plain white card: no band, no pills, no icons except on the button */
 .student-quiz-card {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 0 var(--space-5) var(--space-5);
+  padding: var(--space-5);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
@@ -24,41 +25,6 @@
     opacity: 0;
     transform: translateY(12px);
   }
-}
-
-.student-quiz-card__band {
-  display: flex;
-  align-items: center;
-  min-height: 60px;
-  margin: -1px calc(-1 * var(--space-5) - 1px) var(--space-1);
-  padding: var(--space-2) var(--space-5);
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
-  background-color: var(--accent-soft);
-  background-image: radial-gradient(
-    color-mix(in srgb, var(--accent-bright) 55%, transparent) 1.3px,
-    transparent 1.5px
-  );
-  background-position: 7px 7px;
-  background-size: 14px 14px;
-}
-
-.student-quiz-card__time {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px 4px 10px;
-  border-radius: var(--radius-full);
-  background: var(--color-surface);
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.08);
-  color: var(--accent-ink);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.student-quiz-card__time .icon {
-  width: 16px;
-  height: 16px;
 }
 
 .student-quiz-card__heading {
@@ -91,25 +57,35 @@
   line-clamp: 2;
 }
 
+/* "5 questions   10 min": plain text with a gap */
 .student-quiz-card__meta {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-5);
   margin-top: auto;
-  padding-top: var(--space-3);
-  border-top: 1px dashed var(--color-border);
+  padding-top: var(--space-1);
   color: var(--color-text-muted);
   font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
 }
 
-.student-quiz-card__meta .icon {
-  width: 17px;
-  height: 17px;
+.student-quiz-card__meta > span {
+  white-space: nowrap;
+}
+
+.student-quiz-card__last {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.student-quiz-card__last strong {
+  color: var(--color-text);
 }
 
 .student-quiz-card__start {
   width: 100%;
   min-height: 48px;
+  margin-top: var(--space-1);
   margin-bottom: var(--lip);
 }

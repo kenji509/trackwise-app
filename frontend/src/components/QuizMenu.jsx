@@ -2,9 +2,10 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import './QuizMenu.css'
 
-// "⋯" button that opens Edit / Manage questions / Delete. Manage questions only
+// "Manage" text button that opens Edit / Manage questions / Delete. Manage questions only
 // shows when onManage is given (not for sample quizzes). Always visible (not hover-only), so it
 // works with touch, mouse and keyboard (UI UX Pro Max: hover-vs-tap).
+// label is the accessible name; it starts with the visible word "Manage".
 // Keyboard (WAI-ARIA menu button): Enter/Space/↓ open on the first item, ↑ on the
 // last; ↑/↓/Home/End move; Esc closes and returns focus; Tab closes.
 // buttonRef lets the card put focus back on this button (e.g. after "Cancel" delete).
@@ -94,7 +95,7 @@ function QuizMenu({ label, buttonRef, onEdit, onManage, onDelete, disabled }) {
         ref={buttonRef}
         id={buttonId}
         type="button"
-        className="icon-btn quiz-menu__button"
+        className="btn btn-ghost quiz-menu__button"
         aria-label={label}
         aria-haspopup="menu"
         aria-expanded={open}
@@ -103,11 +104,7 @@ function QuizMenu({ label, buttonRef, onEdit, onManage, onDelete, disabled }) {
         onKeyDown={handleButtonKeyDown}
         disabled={disabled}
       >
-        <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="5" cy="12" r="1.3" />
-          <circle cx="12" cy="12" r="1.3" />
-          <circle cx="19" cy="12" r="1.3" />
-        </svg>
+        Manage
       </button>
 
       {open && (

@@ -10,20 +10,8 @@
   box-shadow: var(--shadow-sm);
 }
 
-.score-trend__head {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
 .score-trend__title {
   font-size: var(--text-lg);
-}
-
-.score-trend__sub,
-.score-trend__note {
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
 }
 
 .score-trend__frame {

@@ -66,20 +66,9 @@
   min-width: 0;
 }
 
-/* Title with a yellow highlighter swipe (ink on yellow 11.10:1) */
+/* No highlighter: that is kept for page titles */
 .dialog__title {
-  display: inline;
-  margin-left: -4px;
-  padding: 0 4px;
   font-size: 1.625rem; /* 26px */
-  background: linear-gradient(
-    transparent 60%,
-    var(--color-sunny-hover) 60%,
-    var(--color-sunny-hover) 92%,
-    transparent 92%
-  );
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
 }
 
 .dialog__subtitle {

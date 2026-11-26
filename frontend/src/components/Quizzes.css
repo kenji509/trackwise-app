@@ -12,19 +12,9 @@
   gap: var(--space-2) var(--space-4);
 }
 
-/* Yellow highlighter swipe behind the heading (ink on yellow 11.10:1) */
+/* Section heading: no highlighter (that is kept for page titles) */
 .quizzes__heading {
-  padding: 0 4px;
-  margin-left: -4px;
   font-size: 1.5rem; /* 24px */
-  background: linear-gradient(
-    transparent 58%,
-    var(--color-sunny-hover) 58%,
-    var(--color-sunny-hover) 92%,
-    transparent 92%
-  );
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
 }
 
 .quizzes__grid {
@@ -84,8 +74,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  height: 260px;
-  padding: 0 var(--space-5) var(--space-5);
+  height: 240px;
+  padding: var(--space-5);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
@@ -105,13 +95,6 @@
   animation: pulse 1.2s ease-in-out infinite;
 }
 
-.skeleton--band {
-  height: 60px;
-  margin: 0 calc(-1 * var(--space-5)) var(--space-2);
-  border-radius: 0;
-}
-
-.skeleton-card--list .skeleton--band,
 .skeleton-card--list .skeleton--chips {
   display: none;
 }

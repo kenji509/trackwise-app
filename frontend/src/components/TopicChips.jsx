@@ -4,7 +4,8 @@ import './TopicChips.css'
 // Topic labels in their topic color. They're static labels, not buttons.
 // With more than `max` topics, a "+n" button reveals the rest, so no topic is
 // ever hidden for good (UI UX Pro Max: chip-collection-reflow).
-function TopicChips({ topics, max = Infinity, emptyText, className = '' }) {
+// plain: names only, comma separated, no color squares (the quiz cards).
+function TopicChips({ topics, max = Infinity, emptyText, plain = false, className = '' }) {
   const [expanded, setExpanded] = useState(false)
 
   if (topics.length === 0) {
@@ -15,7 +16,7 @@ function TopicChips({ topics, max = Infinity, emptyText, className = '' }) {
   const hiddenCount = topics.length - shown.length
 
   return (
-    <ul className={`topic-chips ${className}`} aria-label="Topics">
+    <ul className={`topic-chips ${plain ? 'topic-chips--plain' : ''} ${className}`} aria-label="Topics">
       {shown.map((topic) => (
         <li key={topic.topicId} className={`topic-chip accent-${topic.accent}`}>
           {topic.name}
