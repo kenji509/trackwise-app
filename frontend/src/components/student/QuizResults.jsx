@@ -1,6 +1,6 @@
 import AnswerReview from './AnswerReview.jsx'
 import TopicBreakdown from './TopicBreakdown.jsx'
-import { resultSummary } from '../quizAttempt.js'
+import { resultSummary } from '../../quizAttempt.js'
 import './QuizResults.css'
 
 const submittedFormat = new Intl.DateTimeFormat('en-US', {

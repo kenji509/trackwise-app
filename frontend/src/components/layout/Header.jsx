@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import SideUser from './SideUser.jsx'
-import { initials } from '../authForm.js'
+import { initials } from '../../authForm.js'
 import './Header.css'
 
 // Mobile-only app bar: menu button, logo, signed-in user.

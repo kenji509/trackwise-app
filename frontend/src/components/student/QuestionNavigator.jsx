@@ -1,4 +1,4 @@
-import { navigatorLabel, navigatorStatus, questionState } from '../quizAttempt.js'
+import { navigatorLabel, navigatorStatus, questionState } from '../../quizAttempt.js'
 import './QuestionNavigator.css'
 
 function FlagIcon({ className }) {

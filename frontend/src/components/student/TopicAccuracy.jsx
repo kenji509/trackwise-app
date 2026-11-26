@@ -1,6 +1,6 @@
 import LevelBadge from './LevelBadge.jsx'
 import LevelBar, { LevelScale } from './LevelBar.jsx'
-import { LEVELS } from '../progressData.js'
+import { LEVELS } from '../../progressData.js'
 import './TopicAccuracy.css'
 
 const TICK_TEXT = LEVELS.filter((level) => level.min > 0)

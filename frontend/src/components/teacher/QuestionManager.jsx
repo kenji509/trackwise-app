@@ -1,4 +1,4 @@
-import { formatDate } from '../quizData.js'
+import { formatDate } from '../../quizData.js'
 import './QuestionManager.css'
 
 function QuestionManager({ quiz, state, loadError, saveError, list, onRetry, onAdd, children }) {

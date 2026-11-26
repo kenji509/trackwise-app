@@ -3,7 +3,7 @@ import NoAttempts from './NoAttempts.jsx'
 import ReviewCard from './ReviewCard.jsx'
 import ScoreTrend from './ScoreTrend.jsx'
 import TopicAccuracy from './TopicAccuracy.jsx'
-import { plural } from '../quizData.js'
+import { plural } from '../../quizData.js'
 import './MyProgress.css'
 
 // The trend chart needs at least this many graded quizzes

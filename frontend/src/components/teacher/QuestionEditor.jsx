@@ -1,6 +1,6 @@
 import ChoiceFields from './ChoiceFields.jsx'
-import FormField from './FormField.jsx'
-import { QUESTION_MAX } from '../questionForm.js'
+import FormField from '../shared/FormField.jsx'
+import { QUESTION_MAX } from '../../questionForm.js'
 import './QuestionEditor.css'
 
 function QuestionEditor({

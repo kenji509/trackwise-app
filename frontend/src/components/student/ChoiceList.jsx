@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { choiceLetter } from '../quizAttempt.js'
+import { choiceLetter } from '../../quizAttempt.js'
 import './ChoiceList.css'
 
 function ChoiceList({ choices, selectedId, onSelect, labelledBy }) {

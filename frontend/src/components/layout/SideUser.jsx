@@ -1,4 +1,4 @@
-import { initials, roleLabel } from '../authForm.js'
+import { initials, roleLabel } from '../../authForm.js'
 import './SideUser.css'
 
 function SideUser({ user, onLogout }) {

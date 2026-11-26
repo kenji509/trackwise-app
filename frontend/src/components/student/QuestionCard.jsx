@@ -1,6 +1,6 @@
 import ChoiceList from './ChoiceList.jsx'
-import TopicChips from './TopicChips.jsx'
-import { topicAccent } from '../quizData.js'
+import TopicChips from '../shared/TopicChips.jsx'
+import { topicAccent } from '../../quizData.js'
 import './QuestionCard.css'
 
 function QuestionCard({

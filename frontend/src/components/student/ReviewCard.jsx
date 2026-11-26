@@ -1,4 +1,4 @@
-import { topicAccent } from '../quizData.js'
+import { topicAccent } from '../../quizData.js'
 import './ReviewCard.css'
 
 function ReviewCard({ topics }) {

@@ -1,5 +1,5 @@
-import TopicChips from './TopicChips.jsx'
-import { plural } from '../quizData.js'
+import TopicChips from '../shared/TopicChips.jsx'
+import { plural } from '../../quizData.js'
 import './StudentQuizCard.css'
 
 const MAX_STAGGER = 8

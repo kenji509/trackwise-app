@@ -1,4 +1,4 @@
-import { topicAccent } from '../quizData.js'
+import { topicAccent } from '../../quizData.js'
 import './ProgressSummary.css'
 
 // A topic name with its color square, or a muted note when there is none

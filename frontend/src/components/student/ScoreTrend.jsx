@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { formatDateTime, levelThresholds } from '../progressData.js'
+import { formatDateTime, levelThresholds } from '../../progressData.js'
 import './ScoreTrend.css'
 
 const HEIGHT = 220

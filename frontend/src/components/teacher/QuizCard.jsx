@@ -2,8 +2,8 @@ import { useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import QuizMenu from './QuizMenu.jsx'
 import StatusBadge from './StatusBadge.jsx'
-import TopicChips from './TopicChips.jsx'
-import { formatDate, plural } from '../quizData.js'
+import TopicChips from '../shared/TopicChips.jsx'
+import { formatDate, plural } from '../../quizData.js'
 import './QuizCard.css'
 
 // Cards after this many share the last entrance delay

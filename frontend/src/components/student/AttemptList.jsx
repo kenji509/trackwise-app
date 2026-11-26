@@ -1,5 +1,5 @@
 import LevelBadge from './LevelBadge.jsx'
-import { formatDateTime } from '../progressData.js'
+import { formatDateTime } from '../../progressData.js'
 import './AttemptList.css'
 
 function AttemptList({ attempts, onView }) {

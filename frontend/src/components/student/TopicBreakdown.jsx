@@ -1,5 +1,5 @@
 import LevelBar, { LevelScale } from './LevelBar.jsx'
-import { levelFor } from '../progressData.js'
+import { levelFor } from '../../progressData.js'
 import './TopicBreakdown.css'
 
 // Score by topic on the Results screen. The square next to the name is the

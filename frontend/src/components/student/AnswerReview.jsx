@@ -1,5 +1,5 @@
-import { answerStatus } from '../quizAttempt.js'
-import { topicAccent } from '../quizData.js'
+import { answerStatus } from '../../quizAttempt.js'
+import { topicAccent } from '../../quizData.js'
 import './AnswerReview.css'
 
 function markIcon(right) {

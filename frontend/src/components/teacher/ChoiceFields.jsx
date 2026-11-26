@@ -1,5 +1,5 @@
-import { choiceLetter } from '../quizAttempt.js'
-import { CHOICE_MAX } from '../questionForm.js'
+import { choiceLetter } from '../../quizAttempt.js'
+import { CHOICE_MAX } from '../../questionForm.js'
 import './ChoiceFields.css'
 
 function errorIcon() {

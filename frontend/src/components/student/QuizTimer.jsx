@@ -1,4 +1,4 @@
-import { formatClock, spokenDuration, timerLevel, timerWarning } from '../quizAttempt.js'
+import { formatClock, spokenDuration, timerLevel, timerWarning } from '../../quizAttempt.js'
 import './QuizTimer.css'
 
 function QuizTimer({ seconds, totalSeconds }) {

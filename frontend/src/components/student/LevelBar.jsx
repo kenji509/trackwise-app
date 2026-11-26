@@ -1,4 +1,4 @@
-import { levelThresholds } from '../progressData.js'
+import { levelThresholds } from '../../progressData.js'
 import './LevelBar.css'
 
 const THRESHOLDS = levelThresholds().sort((a, b) => a - b)
